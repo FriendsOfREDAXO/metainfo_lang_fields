@@ -9,6 +9,19 @@ $fieldValue = $this->fieldValue ?? '';
 $fieldId = $this->fieldId ?? '';
 $fieldLabel = $this->fieldLabel ?? '';
 $fieldType = $this->fieldType ?? 'text';
+$fieldAttributes = $this->fieldAttributes ?? '';
+$fieldClass = $this->fieldClass ?? 'form-control';
+$additionalAttributes = $this->additionalAttributes ?? [];
+
+// Helper-Funktion um zusätzliche Attribute als String zu generieren
+$generateAdditionalAttrs = function($additionalAttributes) {
+    $attrString = '';
+    foreach ($additionalAttributes as $name => $value) {
+        $attrString .= ' ' . rex_escape($name) . '="' . rex_escape($value) . '"';
+    }
+    return $attrString;
+};
+$additionalAttrsString = $generateAdditionalAttrs($additionalAttributes);
 
 // Sprachdaten parsen
 $languageData = MetainfoLangHelper::normalizeLanguageData($fieldValue);
@@ -71,16 +84,16 @@ if (is_array($languageData)) {
             <div class="col-sm-9">
                 <div class="input-group">
                     <?php if ($fieldType === 'textarea'): ?>
-                        <textarea class="form-control lang-field-input" 
+                        <textarea class="<?= rex_escape($fieldClass) ?> lang-field-input" 
                                   data-clang-id="<?= $firstClangId ?>"
                                   rows="6" 
-                                  placeholder="<?= rex_escape($firstLang->getName()) ?> Text..."><?= rex_escape($firstValue) ?></textarea>
+                                  placeholder="<?= rex_escape($firstLang->getName()) ?> Text..."<?= $additionalAttrsString ?>><?= rex_escape($firstValue) ?></textarea>
                     <?php else: ?>
                         <input type="text" 
-                               class="form-control lang-field-input" 
+                               class="<?= rex_escape($fieldClass) ?> lang-field-input" 
                                data-clang-id="<?= $firstClangId ?>"
                                value="<?= rex_escape($firstValue) ?>" 
-                               placeholder="<?= rex_escape($firstLang->getName()) ?> Text..." />
+                               placeholder="<?= rex_escape($firstLang->getName()) ?> Text..."<?= $additionalAttrsString ?> />
                     <?php endif; ?>
                     
                     <?php if (count($allLanguages) > 1): ?>
@@ -117,16 +130,16 @@ if (is_array($languageData)) {
                     </div>
                     <div class="col-sm-9">
                         <?php if ($fieldType === 'textarea'): ?>
-                            <textarea class="form-control lang-field-input" 
+                            <textarea class="<?= rex_escape($fieldClass) ?> lang-field-input" 
                                       data-clang-id="<?= $clangId ?>"
                                       rows="4" 
-                                      placeholder="<?= rex_escape($language->getName()) ?> Text..."><?= rex_escape($langValue) ?></textarea>
+                                      placeholder="<?= rex_escape($language->getName()) ?> Text..."<?= $additionalAttrsString ?>><?= rex_escape($langValue) ?></textarea>
                         <?php else: ?>
                             <input type="text" 
-                                   class="form-control lang-field-input" 
+                                   class="<?= rex_escape($fieldClass) ?> lang-field-input" 
                                    data-clang-id="<?= $clangId ?>"
                                    value="<?= rex_escape($langValue) ?>" 
-                                   placeholder="<?= rex_escape($language->getName()) ?> Text..." />
+                                   placeholder="<?= rex_escape($language->getName()) ?> Text..."<?= $additionalAttrsString ?> />
                         <?php endif; ?>
                     </div>
                 </div>

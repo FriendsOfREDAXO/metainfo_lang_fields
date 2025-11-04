@@ -8,6 +8,19 @@ $fieldValue = $this->fieldValue ?? '';
 $fieldId = $this->fieldId ?? '';
 $fieldLabel = $this->fieldLabel ?? '';
 $fieldType = $this->fieldType ?? 'text';
+$fieldAttributes = $this->fieldAttributes ?? '';
+$fieldClass = $this->fieldClass ?? 'form-control';
+$additionalAttributes = $this->additionalAttributes ?? [];
+
+// Helper-Funktion um zusätzliche Attribute als String zu generieren
+$generateAdditionalAttrs = function($additionalAttributes) {
+    $attrString = '';
+    foreach ($additionalAttributes as $name => $value) {
+        $attrString .= ' ' . rex_escape($name) . '="' . rex_escape($value) . '"';
+    }
+    return $attrString;
+};
+$additionalAttrsString = $generateAdditionalAttrs($additionalAttributes);
 
 // Sprachdaten parsen
 $languageData = MetainfoLangHelper::normalizeLanguageData($fieldValue);
@@ -45,13 +58,13 @@ $allLanguages = MetainfoLangHelper::getActiveLanguages();
                     </div>
                     <div class="col-sm-8">
                         <?php if ($fieldType === 'textarea'): ?>
-                            <textarea class="form-control lang-textarea" 
-                                      rows="4" cols="50"><?= rex_escape($langValue) ?></textarea>
+                            <textarea class="<?= rex_escape($fieldClass) ?> lang-textarea" 
+                                      rows="4" cols="50"<?= $additionalAttrsString ?>><?= rex_escape($langValue) ?></textarea>
                         <?php else: ?>
                             <input type="text" 
-                                   class="form-control lang-input" 
+                                   class="<?= rex_escape($fieldClass) ?> lang-input" 
                                    value="<?= rex_escape($langValue) ?>" 
-                                   placeholder="<?= rex_escape($language->getName()) ?> Text..." />
+                                   placeholder="<?= rex_escape($language->getName()) ?> Text..."<?= $additionalAttrsString ?> />
                         <?php endif; ?>
                     </div>
                     <div class="col-sm-1">
@@ -87,13 +100,13 @@ $allLanguages = MetainfoLangHelper::getActiveLanguages();
             </div>
             <div class="col-sm-5">
                 <?php if ($fieldType === 'textarea'): ?>
-                    <textarea class="form-control new-translation-textarea" 
+                    <textarea class="<?= rex_escape($fieldClass) ?> new-translation-textarea" 
                               rows="4" cols="50" 
-                              placeholder="Neue Übersetzung..."></textarea>
+                              placeholder="Neue Übersetzung..."<?= $additionalAttrsString ?>></textarea>
                 <?php else: ?>
                     <input type="text" 
-                           class="form-control new-translation-input" 
-                           placeholder="Neue Übersetzung..." />
+                           class="<?= rex_escape($fieldClass) ?> new-translation-input" 
+                           placeholder="Neue Übersetzung..."<?= $additionalAttrsString ?> />
                 <?php endif; ?>
             </div>
             <div class="col-sm-1">

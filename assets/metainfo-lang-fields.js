@@ -152,7 +152,8 @@ $(document).on('rex:ready', function() {
         container.find('.lang-translation-item').each(function() {
             var item = $(this);
             var clangId = parseInt(item.data('clang-id'));
-            var value = item.find('.lang-input, .lang-textarea').val() || '';
+            var input = item.find('.lang-input, .lang-textarea');
+            var value = input.val() || '';
             
             if (value.trim()) {
                 data.push({

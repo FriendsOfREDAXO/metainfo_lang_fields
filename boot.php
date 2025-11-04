@@ -64,11 +64,39 @@ function metainfo_lang_fields_custom_field(rex_extension_point $ep)
     $fieldId = $subject[3];
     $fieldLabel = $subject[4];
     
-
+    // Attribute aus dem SQL-Objekt extrahieren 
+    $fieldAttributes = '';
+    $fieldClass = 'form-control';
+    $additionalAttributes = [];
     
-
-    
-
+    if (isset($subject['sql']) && $subject['sql'] instanceof rex_sql) {
+        $attributes = $subject['sql']->getValue('attributes');
+        if (!empty($attributes)) {
+            $fieldAttributes = $attributes;
+            
+            // CSS-Klassen aus Attributen extrahieren
+            if (preg_match('/class="([^"]*)"/', $attributes, $matches)) {
+                $fieldClass = $matches[1];
+            } elseif (preg_match("/class='([^']*)'/", $attributes, $matches)) {
+                $fieldClass = $matches[1];
+            }
+            
+            // Alle anderen Attribute (data-*, id, etc.) extrahieren
+            // Entferne class-Attribute und behalte den Rest
+            $remainingAttributes = preg_replace('/class=("[^"]*"|\'[^\']*\')/', '', $attributes);
+            $remainingAttributes = trim($remainingAttributes);
+            
+            if (!empty($remainingAttributes)) {
+                // Attribute in Array parsen für bessere Handhabung
+                preg_match_all('/(\w+(?:-\w+)*)=("[^"]*"|\'[^\']*\')/', $remainingAttributes, $attrMatches, PREG_SET_ORDER);
+                foreach ($attrMatches as $match) {
+                    $attrName = $match[1];
+                    $attrValue = trim($match[2], '"\'');
+                    $additionalAttributes[$attrName] = $attrValue;
+                }
+            }
+        }
+    }
     
     // Fragment für die Ausgabe verwenden
     $fragment = new rex_fragment();
@@ -76,19 +104,23 @@ function metainfo_lang_fields_custom_field(rex_extension_point $ep)
     $fragment->setVar('fieldValue', $fieldValue);
     $fragment->setVar('fieldId', $fieldId);
     $fragment->setVar('fieldLabel', $fieldLabel);
+    $fragment->setVar('fieldAttributes', $fieldAttributes);
+    $fragment->setVar('fieldClass', $fieldClass);
+    $fragment->setVar('additionalAttributes', $additionalAttributes);
     
     // Feldtyp bestimmen und entsprechendes Fragment wählen
     if (str_contains($type, '_all')) {
         // Alle Sprachen Modus
         $fragment->setVar('fieldType', str_replace(['lang_', '_all'], '', $type)); // 'text' oder 'textarea'
         $fragmentFile = 'metainfo_lang_field_all.php';
-        } else {
+    } else {
         // Repeater Modus
         $fragment->setVar('fieldType', str_replace('lang_', '', $type)); // 'text' oder 'textarea'
         $fragmentFile = 'metainfo_lang_field.php';
     }
     
-    $html = $fragment->parse($fragmentFile);    $subject[0] = $html;
+    $html = $fragment->parse($fragmentFile);
+    $subject[0] = $html;
     return $subject;
 }
 

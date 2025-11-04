@@ -36,6 +36,39 @@ Ein REDAXO Add-on für mehrsprachige Metainfo-Felder mit zwei verschiedenen Benu
 - Alle Sprachen sind als Felder vorhanden
 - Erste Sprache sichtbar, weitere per Globus-Button einblendbar
 
+### CKE5 Integration 🚀
+
+Das Add-on unterstützt CKE5 im **"Alle Sprachen Modus"** (`lang_textarea_all`). Verwende einfach die CKE5 CSS-Klassen im "Attribute" Feld:
+
+**Einfache CKE5 Integration**:
+```
+class="form-control cke5-editor"
+```
+
+**Mit spezifischem CKE5 Profil**:
+```
+class="form-control cke5-editor" data-profile="full"
+```
+
+**Beispiel-Feld für mehrsprachige CKE5-Inhalte**:
+- Feldtyp: `lang_textarea_all` ⚠️ **Nur "Alle Sprachen" Modus!**
+- Name: `art_content_rich`
+- Attribute: `class="form-control cke5-editor" data-profile="default"`
+- ✅ Ergebnis: Mehrsprachige Rich-Text-Felder mit CKE5 Editor
+
+**Ergebnis-HTML** (automatisch generiert):
+```html
+<textarea class="cke5-editor lang-field-input" 
+          data-clang-id="1" 
+          rows="6" 
+          placeholder="Deutsch Text..." 
+          data-profile="default">Inhalt...</textarea>
+```
+
+> ⚠️ **Wichtig**: CKE5 funktioniert nur zuverlässig mit `lang_textarea_all` (Alle Sprachen Modus). Im Repeater-Modus können dynamisch hinzugefügte Felder nicht automatisch mit CKE5 initialisiert werden.
+
+> 💡 **Tipp**: Die ursprünglichen CSS-Klassen und Attribute werden automatisch an alle generierten Textareas/Input-Felder weitergegeben!
+
 ### Daten im Frontend abrufen
 
 ```php
