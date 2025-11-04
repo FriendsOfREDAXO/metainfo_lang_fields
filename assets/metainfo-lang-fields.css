@@ -1,0 +1,85 @@
+/* Metainfo Lang Fields CSS */
+
+.metainfo-lang-field {
+    margin-bottom: 15px;
+}
+
+.lang-translations {
+    margin-bottom: 10px;
+}
+
+.lang-translation-item {
+    margin-bottom: 10px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: #f9f9f9;
+}
+
+.lang-translation-item:hover {
+    background-color: #f5f5f5;
+}
+
+.lang-translation-item label {
+    font-weight: 600;
+    margin-bottom: 5px;
+    display: block;
+}
+
+.lang-input,
+.lang-textarea {
+    width: 100%;
+}
+
+.add-translation-section {
+    padding: 10px;
+    border: 2px dashed #ccc;
+    border-radius: 4px;
+    background-color: #fafafa;
+    margin-top: 10px;
+}
+
+.add-translation-section:hover {
+    background-color: #f0f0f0;
+    border-color: #bbb;
+}
+
+.lang-select {
+    margin-bottom: 5px;
+}
+
+.new-translation-input,
+.new-translation-textarea {
+    margin-bottom: 5px;
+}
+
+.btn-sm {
+    padding: 3px 8px;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+/* Icons falls noch nicht vorhanden */
+.rex-icon-add:before {
+    content: "+";
+}
+
+.rex-icon-delete:before {
+    content: "×";
+}
+
+/* Animation für neue Übersetzungen */
+.lang-translation-item.new-item {
+    animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+    from { 
+        opacity: 0; 
+        transform: translateY(-10px); 
+    }
+    to { 
+        opacity: 1; 
+        transform: translateY(0); 
+    }
+}

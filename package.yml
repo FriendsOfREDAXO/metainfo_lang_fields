@@ -1,0 +1,19 @@
+package: metainfo_lang_fields
+version: '1.0.0'
+author: 'Thomas Skerbis'
+author_email: 'thomas@klxm.de'
+description: 'Mehrsprachige Metainfo-Felder mit zwei Benutzeroberflächen'
+license: 'MIT'
+supportpage: 'https://github.com/klxmcrossmedia/metainfo-lang-fields'
+website: 'https://klxm.de'
+
+page:
+    title: 'Metainfo Lang Fields'
+    perm: admin[]
+    
+requires:
+    packages:
+        metainfo: '>=2.11'
+    redaxo: '^5.15'
+    php:
+        version: '^8.1'
