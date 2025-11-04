@@ -40,28 +40,24 @@ if (is_array($languageData)) {
 
 
 <div class="metainfo-lang-field-all" data-field-name="<?= rex_escape($fieldName) ?>" style="background: rgba(255, 255, 255, 0.6); padding: 15px; border-radius: 8px; margin-bottom: 15px; border: 1px solid rgba(0, 0, 0, 0.1);">
-    <!-- Feld-Label -->
+    
     <?php if (!empty($fieldLabel)): ?>
-    <div style="display: block; margin-bottom: 10px; font-weight: bold;">
+    <label class="control-label" style="margin-bottom: 15px; display: block; font-weight: bold; font-size: 14px;">
         <?php
-        // Label extrahieren - zwischen > und <
-        if (preg_match('/>([^<]+)</', $fieldLabel, $matches)) {
-            echo rex_escape($matches[1]);
-        } else {
-            // Fallback: Versuche verschiedene Methoden
-            $decoded = html_entity_decode($fieldLabel, ENT_QUOTES, 'UTF-8');
-            if (preg_match('/>([^<]+)</', $decoded, $matches2)) {
-                echo rex_escape($matches2[1]);
+        // Label-Text aus HTML extrahieren
+        $cleanLabel = $fieldLabel;
+        if (is_string($cleanLabel)) {
+            // Zuerst versuchen den Text zwischen den Label-Tags zu extrahieren
+            if (preg_match('/<label[^>]*>([^<]*)<\/label>/', $cleanLabel, $matches)) {
+                $cleanLabel = $matches[1];
             } else {
-                // Als letztes Resort: strip_tags verwenden
-                $stripped = strip_tags($decoded);
-                echo rex_escape($stripped ?: 'Unbekanntes Feld');
+                // Fallback: Alle HTML-Tags entfernen
+                $cleanLabel = strip_tags(html_entity_decode($cleanLabel, ENT_QUOTES, 'UTF-8'));
             }
         }
+        echo rex_escape($cleanLabel);
         ?>
-    </div>
-    <?php else: ?>
-    <!-- DEBUG: Label ist leer! -->
+    </label>
     <?php endif; ?>
     
     <!-- Verstecktes Feld für JSON-Daten -->

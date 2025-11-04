@@ -28,12 +28,26 @@ $availableLanguages = \KLXM\MetaInfoLangFields\MetainfoLangHelper::getAvailableL
 $allLanguages = \KLXM\MetaInfoLangFields\MetainfoLangHelper::getActiveLanguages();
 ?>
 
-<div class="metainfo-lang-field" data-field-name="<?= rex_escape($fieldName) ?>">
-    <!-- Feld-Label -->
+<div class="metainfo-lang-field" data-field-name="<?= rex_escape($fieldName) ?>" style="background: rgba(255, 255, 255, 0.6); padding: 15px; border-radius: 8px; margin-bottom: 15px; border: 1px solid rgba(0, 0, 0, 0.1);">
+    
+    
     <?php if (!empty($fieldLabel)): ?>
-    <div style="display: block; margin-bottom: 10px; font-weight: bold;">
-        <?= $fieldLabel ?>
-    </div>
+    <label class="control-label" style="margin-bottom: 10px; display: block; font-weight: bold;">
+        <?php
+        // Label-Text aus HTML extrahieren
+        $cleanLabel = $fieldLabel;
+        if (is_string($cleanLabel)) {
+            // Zuerst versuchen den Text zwischen den Label-Tags zu extrahieren
+            if (preg_match('/<label[^>]*>([^<]*)<\/label>/', $cleanLabel, $matches)) {
+                $cleanLabel = $matches[1];
+            } else {
+                // Fallback: Alle HTML-Tags entfernen
+                $cleanLabel = strip_tags(html_entity_decode($cleanLabel, ENT_QUOTES, 'UTF-8'));
+            }
+        }
+        echo rex_escape($cleanLabel);
+        ?>
+    </label>
     <?php endif; ?>
     
     <!-- Verstecktes Feld für JSON-Daten -->
