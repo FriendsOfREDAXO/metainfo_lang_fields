@@ -72,22 +72,22 @@ class="form-control cke5-editor" data-profile="full"
 ### Daten im Frontend abrufen
 
 ```php
-// Helper-Klasse verwenden
-$helper = new MetainfoLangHelper();
+// Helper-Klasse verwenden (KLXM\MetaInfoLangFields Namespace)
+use KLXM\MetaInfoLangFields\MetainfoLangHelper;
 
 // Wert für aktuelle Sprache
-$value = $helper::getValueForLanguage(
+$value = MetainfoLangHelper::getValueForLanguage(
     $article->getValue('art_title_lang'), 
     rex_clang::getCurrentId()
 );
 
 // Prüfen ob Übersetzung existiert
-if ($helper::hasTranslationForLanguage($article->getValue('art_title_lang'), 2)) {
+if (MetainfoLangHelper::hasTranslationForLanguage($article->getValue('art_title_lang'), 2)) {
     echo 'Englische Übersetzung vorhanden';
 }
 
 // Alle Übersetzungen abrufen
-$allTranslations = $helper::normalizeLanguageData($article->getValue('art_title_lang'));
+$allTranslations = MetainfoLangHelper::normalizeLanguageData($article->getValue('art_title_lang'));
 foreach ($allTranslations as $translation) {
     $langName = rex_clang::get($translation['clang_id'])->getName();
     echo $langName . ': ' . $translation['value'] . '<br>';
@@ -97,6 +97,8 @@ foreach ($allTranslations as $translation) {
 ### Beispiel: Fallback-Logik
 ```php
 // Mit Fallback auf Standardsprache
+use KLXM\MetaInfoLangFields\MetainfoLangHelper;
+
 function getLocalizedValue($jsonData, $clangId = null) {
     $clangId = $clangId ?: rex_clang::getCurrentId();
     
@@ -131,7 +133,7 @@ Das Add-on funktioniert in allen REDAXO-Bereichen:
 - **Datenformat**: JSON mit `clang_id` und `value` Objekten
 - **Frontend**: Bootstrap 3 + Font Awesome 6 + jQuery
 - **Backend**: REDAXO Extension Points (`METAINFO_CUSTOM_FIELD`)
-- **Helper-Klasse**: `MetainfoLangHelper` für Datenverarbeitung
+- **Helper-Klasse**: `KLXM\MetaInfoLangFields\MetainfoLangHelper` für Datenverarbeitung
 
 ## Support
 

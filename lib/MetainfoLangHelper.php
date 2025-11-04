@@ -1,8 +1,11 @@
 <?php
 
+namespace KLXM\MetaInfoLangFields;
+
 /**
  * Helper-Klasse für mehrsprachige Metainfo-Felder
  * 
+ * @author Thomas Skerbis
  * @package metainfo_lang_fields
  */
 class MetainfoLangHelper
@@ -12,7 +15,7 @@ class MetainfoLangHelper
      */
     public static function getActiveLanguages(): array
     {
-        return rex_clang::getAll();
+        return \rex_clang::getAll();
     }
 
     /**
@@ -107,13 +110,13 @@ class MetainfoLangHelper
     public static function getLanguageSelectHtml(string $name, int $selectedId = null): string
     {
         $languages = self::getActiveLanguages();
-        $html = '<select name="' . rex_escape($name) . '" class="form-control lang-select">';
+        $html = '<select name="' . \rex_escape($name) . '" class="form-control lang-select">';
         $html .= '<option value="">Sprache wählen...</option>';
         
         foreach ($languages as $lang) {
             $selected = $selectedId === $lang->getId() ? ' selected' : '';
             $html .= '<option value="' . $lang->getId() . '"' . $selected . '>';
-            $html .= rex_escape($lang->getName() . ' (' . $lang->getCode() . ')');
+            $html .= \rex_escape($lang->getName() . ' (' . $lang->getCode() . ')');
             $html .= '</option>';
         }
         
