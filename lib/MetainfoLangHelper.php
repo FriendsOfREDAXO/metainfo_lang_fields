@@ -123,4 +123,124 @@ class MetainfoLangHelper
         $html .= '</select>';
         return $html;
     }
+
+    /**
+     * Mehrsprachigen Wert für ein Medium abrufen
+     * 
+     * @param \rex_media|string $media Medium-Objekt oder Dateiname
+     * @param string $fieldName Name des Metainfo-Felds (z.B. 'med_title_lang')
+     * @param int|null $clangId Sprach-ID (null = aktuelle Sprache)
+     * @param bool $useFallback Bei true: Fallback auf Standardsprache wenn leer
+     * @return string Übersetzter Wert oder leerer String
+     */
+    public static function getMediaValue($media, string $fieldName, int $clangId = null, bool $useFallback = true): string
+    {
+        // Medium-Objekt validieren
+        if (is_string($media)) {
+            $media = \rex_media::get($media);
+        }
+        
+        if (!$media instanceof \rex_media) {
+            return '';
+        }
+
+        // Sprach-ID bestimmen
+        $clangId = $clangId ?: \rex_clang::getCurrentId();
+        
+        // Feldwert abrufen
+        $fieldValue = $media->getValue($fieldName);
+        if (empty($fieldValue)) {
+            return '';
+        }
+
+        // Wert für gewünschte Sprache
+        $value = self::getValueForLanguage($fieldValue, $clangId);
+        
+        // Fallback auf Standardsprache
+        if (empty($value) && $useFallback && $clangId !== \rex_clang::getStartId()) {
+            $value = self::getValueForLanguage($fieldValue, \rex_clang::getStartId());
+        }
+
+        return $value;
+    }
+
+    /**
+     * Mehrsprachigen Wert für einen Artikel abrufen
+     * 
+     * @param \rex_article|int $article Artikel-Objekt oder Artikel-ID  
+     * @param string $fieldName Name des Metainfo-Felds (z.B. 'art_title_lang')
+     * @param int|null $clangId Sprach-ID (null = aktuelle Sprache)
+     * @param bool $useFallback Bei true: Fallback auf Standardsprache wenn leer
+     * @return string Übersetzter Wert oder leerer String
+     */
+    public static function getArticleValue($article, string $fieldName, int $clangId = null, bool $useFallback = true): string
+    {
+        // Artikel-Objekt validieren
+        if (is_int($article)) {
+            $article = \rex_article::get($article);
+        }
+        
+        if (!$article instanceof \rex_article) {
+            return '';
+        }
+
+        // Sprach-ID bestimmen
+        $clangId = $clangId ?: \rex_clang::getCurrentId();
+        
+        // Feldwert abrufen
+        $fieldValue = $article->getValue($fieldName);
+        if (empty($fieldValue)) {
+            return '';
+        }
+
+        // Wert für gewünschte Sprache
+        $value = self::getValueForLanguage($fieldValue, $clangId);
+        
+        // Fallback auf Standardsprache
+        if (empty($value) && $useFallback && $clangId !== \rex_clang::getStartId()) {
+            $value = self::getValueForLanguage($fieldValue, \rex_clang::getStartId());
+        }
+
+        return $value;
+    }
+
+    /**
+     * Mehrsprachigen Wert für eine Kategorie abrufen
+     * 
+     * @param \rex_category|int $category Kategorie-Objekt oder Kategorie-ID
+     * @param string $fieldName Name des Metainfo-Felds (z.B. 'cat_title_lang') 
+     * @param int|null $clangId Sprach-ID (null = aktuelle Sprache)
+     * @param bool $useFallback Bei true: Fallback auf Standardsprache wenn leer
+     * @return string Übersetzter Wert oder leerer String
+     */
+    public static function getCategoryValue($category, string $fieldName, int $clangId = null, bool $useFallback = true): string
+    {
+        // Kategorie-Objekt validieren
+        if (is_int($category)) {
+            $category = \rex_category::get($category);
+        }
+        
+        if (!$category instanceof \rex_category) {
+            return '';
+        }
+
+        // Sprach-ID bestimmen
+        $clangId = $clangId ?: \rex_clang::getCurrentId();
+        
+        // Feldwert abrufen
+        $fieldValue = $category->getValue($fieldName);
+        if (empty($fieldValue)) {
+            return '';
+        }
+
+        // Wert für gewünschte Sprache
+        $value = self::getValueForLanguage($fieldValue, $clangId);
+        
+        // Fallback auf Standardsprache
+        if (empty($value) && $useFallback && $clangId !== \rex_clang::getStartId()) {
+            $value = self::getValueForLanguage($fieldValue, \rex_clang::getStartId());
+        }
+
+        return $value;
+    }
 }

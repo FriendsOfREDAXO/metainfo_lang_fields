@@ -15,6 +15,8 @@ Ein REDAXO Add-on für mehrsprachige Metainfo-Felder mit zwei verschiedenen Benu
 - 🔧 Nahtlose Integration in alle REDAXO-Bereiche (Struktur, Medienpool, Content)
 - 🎨 Moderne Bootstrap-basierte UI mit Font Awesome Icons
 - 📱 Responsive Design
+- 🚀 Praktische Helper-Methoden für Frontend-Ausgabe (Artikel, Medien, Kategorien)
+- 🔄 Automatische Fallback-Mechanismen auf Standardsprache
 
 ## Installation
 
@@ -71,11 +73,32 @@ class="form-control cke5-editor" data-profile="full"
 
 ### Daten im Frontend abrufen
 
+#### Einfache Verwendung (empfohlen)
+
+```php
+use KLXM\MetaInfoLangFields\MetainfoLangHelper;
+
+// 📄 ARTIKEL-WERTE
+$articleTitle = MetainfoLangHelper::getArticleValue($article, 'art_title_lang');
+$englishTitle = MetainfoLangHelper::getArticleValue(123, 'art_title_lang', 2); // Artikel-ID + Englisch
+$strictTitle = MetainfoLangHelper::getArticleValue($article, 'art_title_lang', null, false); // Ohne Fallback
+
+// 🖼️ MEDIUM-WERTE  
+$mediaTitle = MetainfoLangHelper::getMediaValue($media, 'med_title_lang');
+$mediaDesc = MetainfoLangHelper::getMediaValue('image.jpg', 'med_description_lang', 2); // Dateiname + Englisch
+
+// 📁 KATEGORIE-WERTE
+$categoryTitle = MetainfoLangHelper::getCategoryValue($category, 'cat_title_lang');
+$categoryDesc = MetainfoLangHelper::getCategoryValue(456, 'cat_description_lang', 3); // Kategorie-ID + Französisch
+```
+
+#### Erweiterte Verwendung
+
 ```php
 // Helper-Klasse verwenden (KLXM\MetaInfoLangFields Namespace)
 use KLXM\MetaInfoLangFields\MetainfoLangHelper;
 
-// Wert für aktuelle Sprache
+// Wert für aktuelle Sprache (Low-Level)
 $value = MetainfoLangHelper::getValueForLanguage(
     $article->getValue('art_title_lang'), 
     rex_clang::getCurrentId()
@@ -94,23 +117,58 @@ foreach ($allTranslations as $translation) {
 }
 ```
 
-### Beispiel: Fallback-Logik
+### Praktische Beispiele
+
+#### Template-Verwendung
 ```php
-// Mit Fallback auf Standardsprache
 use KLXM\MetaInfoLangFields\MetainfoLangHelper;
 
-function getLocalizedValue($jsonData, $clangId = null) {
-    $clangId = $clangId ?: rex_clang::getCurrentId();
+// Artikel-Titel mit automatischem Fallback
+$title = MetainfoLangHelper::getArticleValue($this, 'art_title_lang');
+if (empty($title)) {
+    $title = $this->getName(); // Standard REDAXO-Titel als Fallback
+}
+
+// Medienpool-Integration
+$media = rex_media::get('hero-image.jpg');
+$altText = MetainfoLangHelper::getMediaValue($media, 'med_alt_lang');
+$caption = MetainfoLangHelper::getMediaValue($media, 'med_caption_lang');
+
+echo '<img src="' . $media->getUrl() . '" alt="' . rex_escape($altText) . '">';
+echo '<figcaption>' . rex_escape($caption) . '</figcaption>';
+```
+
+#### Navigations-Beispiel
+```php
+use KLXM\MetaInfoLangFields\MetainfoLangHelper;
+
+// Mehrsprachige Navigation
+$navigation = rex_navigation::factory();
+$navItems = $navigation->get(1, 2); // Kategorie 1, Tiefe 2
+
+foreach ($navItems as $item) {
+    $categoryTitle = MetainfoLangHelper::getCategoryValue($item['id'], 'cat_nav_title_lang');
     
-    // Gewünschte Sprache versuchen
-    $value = MetainfoLangHelper::getValueForLanguage($jsonData, $clangId);
-    
-    // Fallback auf Standardsprache
-    if (empty($value)) {
-        $value = MetainfoLangHelper::getValueForLanguage($jsonData, rex_clang::getStartId());
+    // Fallback auf Standard-Namen wenn kein mehrsprachiger Titel
+    if (empty($categoryTitle)) {
+        $categoryTitle = $item['name'];
     }
     
-    return $value;
+    echo '<a href="' . $item['url'] . '">' . rex_escape($categoryTitle) . '</a>';
+}
+```
+
+#### Sprachspezifische Inhalte ohne Fallback
+```php
+use KLXM\MetaInfoLangFields\MetainfoLangHelper;
+
+// Nur Deutsche Inhalte anzeigen (kein Fallback)
+$germanContent = MetainfoLangHelper::getArticleValue($article, 'art_content_lang', 1, false);
+
+if (!empty($germanContent)) {
+    echo '<div class="german-only">' . $germanContent . '</div>';
+} else {
+    echo '<div class="no-translation">Noch nicht übersetzt</div>';
 }
 ```
 
@@ -139,7 +197,31 @@ Das Add-on funktioniert in allen REDAXO-Bereichen:
 
 Bei Fragen oder Problemen erstellen Sie gerne ein Issue im Repository.
 
+## API-Referenz
+
+### Helper-Methoden Übersicht
+
+| Methode | Parameter | Beschreibung |
+|---------|-----------|--------------|
+| `getArticleValue($article, $fieldName, $clangId, $useFallback)` | Artikel-Objekt/ID, Feldname, Sprach-ID (optional), Fallback (optional) | Mehrsprachigen Artikel-Wert abrufen |
+| `getMediaValue($media, $fieldName, $clangId, $useFallback)` | Medium-Objekt/Dateiname, Feldname, Sprach-ID (optional), Fallback (optional) | Mehrsprachigen Medium-Wert abrufen |
+| `getCategoryValue($category, $fieldName, $clangId, $useFallback)` | Kategorie-Objekt/ID, Feldname, Sprach-ID (optional), Fallback (optional) | Mehrsprachigen Kategorie-Wert abrufen |
+| `getValueForLanguage($data, $clangId)` | JSON-Daten, Sprach-ID | Low-Level: Wert für bestimmte Sprache |
+| `hasTranslationForLanguage($data, $clangId)` | JSON-Daten, Sprach-ID | Prüft ob Übersetzung existiert |
+| `normalizeLanguageData($data)` | JSON-Daten | Normalisiert und validiert Sprachdaten |
+
+**Parameter-Details:**
+- `$clangId = null` → Verwendet aktuelle Sprache (`rex_clang::getCurrentId()`)
+- `$useFallback = true` → Bei leerem Wert wird Standardsprache verwendet
+- `$useFallback = false` → Strikt nur gewünschte Sprache, kein Fallback
+
 ## Changelog
+
+### Version 1.0.1
+- ✨ Neue Helper-Methoden für Artikel, Medien und Kategorien
+- 🔄 Automatische Fallback-Mechanismen
+- 📖 Erweiterte Dokumentation mit praktischen Beispielen
+- 🏗️ KLXM\MetaInfoLangFields Namespace-Organisation
 
 ### Version 1.0.0
 - Initiale Version mit Repeater- und Alle-Sprachen-Modi
