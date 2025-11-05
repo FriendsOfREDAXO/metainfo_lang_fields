@@ -76,7 +76,7 @@ class="form-control cke5-editor" data-profile="full"
 #### Einfache Verwendung (empfohlen)
 
 ```php
-use KLXM\MetaInfoLangFields\MetainfoLangHelper;
+use FriendsOfRedaxo\MetaInfoLangFields\MetainfoLangHelper;
 
 // 📄 ARTIKEL-WERTE
 $articleTitle = MetainfoLangHelper::getArticleValue($article, 'art_title_lang');
@@ -95,8 +95,8 @@ $categoryDesc = MetainfoLangHelper::getCategoryValue(456, 'cat_description_lang'
 #### Erweiterte Verwendung
 
 ```php
-// Helper-Klasse verwenden (KLXM\MetaInfoLangFields Namespace)
-use KLXM\MetaInfoLangFields\MetainfoLangHelper;
+// Helper-Klasse verwenden (FriendsOfRedaxo\MetaInfoLangFields Namespace)
+use FriendsOfRedaxo\MetaInfoLangFields\MetainfoLangHelper;
 
 // Wert für aktuelle Sprache (Low-Level)
 $value = MetainfoLangHelper::getValueForLanguage(
@@ -121,7 +121,7 @@ foreach ($allTranslations as $translation) {
 
 #### Template-Verwendung
 ```php
-use KLXM\MetaInfoLangFields\MetainfoLangHelper;
+use FriendsOfRedaxo\MetaInfoLangFields\MetainfoLangHelper;
 
 // Artikel-Titel mit automatischem Fallback
 $title = MetainfoLangHelper::getArticleValue($this, 'art_title_lang');
@@ -140,7 +140,7 @@ echo '<figcaption>' . rex_escape($caption) . '</figcaption>';
 
 #### Navigations-Beispiel
 ```php
-use KLXM\MetaInfoLangFields\MetainfoLangHelper;
+use FriendsOfRedaxo\MetaInfoLangFields\MetainfoLangHelper;
 
 // Mehrsprachige Navigation
 $navigation = rex_navigation::factory();
@@ -160,7 +160,7 @@ foreach ($navItems as $item) {
 
 #### Sprachspezifische Inhalte ohne Fallback
 ```php
-use KLXM\MetaInfoLangFields\MetainfoLangHelper;
+use FriendsOfRedaxo\MetaInfoLangFields\MetainfoLangHelper;
 
 // Nur Deutsche Inhalte anzeigen (kein Fallback)
 $germanContent = MetainfoLangHelper::getArticleValue($article, 'art_content_lang', 1, false);
@@ -191,7 +191,7 @@ Das Add-on funktioniert in allen REDAXO-Bereichen:
 - **Datenformat**: JSON mit `clang_id` und `value` Objekten
 - **Frontend**: Bootstrap 3 + Font Awesome 6 + jQuery
 - **Backend**: REDAXO Extension Points (`METAINFO_CUSTOM_FIELD`)
-- **Helper-Klasse**: `KLXM\MetaInfoLangFields\MetainfoLangHelper` für Datenverarbeitung
+- **Helper-Klasse**: `FriendsOfRedaxo\MetaInfoLangFields\MetainfoLangHelper` für Datenverarbeitung
 
 ## Support
 
@@ -215,13 +215,26 @@ Bei Fragen oder Problemen erstellen Sie gerne ein Issue im Repository.
 - `$useFallback = true` → Bei leerem Wert wird Standardsprache verwendet
 - `$useFallback = false` → Strikt nur gewünschte Sprache, kein Fallback
 
+## Author
+
+**Friends Of REDAXO**
+
+* http://www.redaxo.org
+* https://github.com/FriendsOfREDAXO
+
+## Credits
+
+**Project Lead**
+
+<a href="https://github.com/skerbis">Thomas Skerbis</a>
+
 ## Changelog
 
 ### Version 1.0.1
 - ✨ Neue Helper-Methoden für Artikel, Medien und Kategorien
 - 🔄 Automatische Fallback-Mechanismen
 - 📖 Erweiterte Dokumentation mit praktischen Beispielen
-- 🏗️ KLXM\MetaInfoLangFields Namespace-Organisation
+- 🏗️ FriendsOfRedaxo\MetaInfoLangFields Namespace-Organisation
 
 ### Version 1.0.0
 - Initiale Version mit Repeater- und Alle-Sprachen-Modi

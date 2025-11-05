@@ -1,6 +1,6 @@
 <?php
 
-namespace KLXM\MetaInfoLangFields;
+namespace FriendsOfRedaxo\MetaInfoLangFields;
 
 /**
  * Helper-Klasse für mehrsprachige Metainfo-Felder

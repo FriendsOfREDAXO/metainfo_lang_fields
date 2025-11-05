@@ -24,8 +24,8 @@ $generateAdditionalAttrs = function($additionalAttributes) {
 $additionalAttrsString = $generateAdditionalAttrs($additionalAttributes);
 
 // Sprachdaten parsen
-$languageData = \KLXM\MetaInfoLangFields\MetainfoLangHelper::normalizeLanguageData($fieldValue);
-$allLanguages = \KLXM\MetaInfoLangFields\MetainfoLangHelper::getActiveLanguages();
+$languageData = \FriendsOfRedaxo\MetaInfoLangFields\MetainfoLangHelper::normalizeLanguageData($fieldValue);
+$allLanguages = \FriendsOfRedaxo\MetaInfoLangFields\MetainfoLangHelper::getActiveLanguages();
 
 // Bestehende Übersetzungen in Array umwandeln für einfachen Zugriff
 $translations = [];
