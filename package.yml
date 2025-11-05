@@ -1,5 +1,5 @@
 package: metainfo_lang_fields
-version: '1.0.0'
+version: '1.0.1'
 author: 'Friends Of REDAXO'
 description: 'Mehrsprachige Metainfo-Felder mit zwei Benutzeroberflächen'
 license: 'MIT'
