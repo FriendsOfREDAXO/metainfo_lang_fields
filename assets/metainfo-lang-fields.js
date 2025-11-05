@@ -2,14 +2,14 @@ $(document).on('rex:ready', function() {
     console.log('metainfo-lang-fields.js loaded');
     
     // Nur für Repeater-Modus, nicht für ALL-Modus
-    if ($('.metainfo-lang-field-all').length > 0) {
+    if ($('.meta_lang_field_all').length > 0) {
         console.log('ALL mode detected, skipping repeater JS');
         return;
     }
     
     // Übersetzung hinzufügen
     $(document).on('click', '.add-translation', function() {
-        var container = $(this).closest('.metainfo-lang-field');
+        var container = $(this).closest('.meta_lang_field');
         var select = container.find('select[name="new_lang_select"]');
         var selectedClangId = select.val();
         var selectedLangName = select.find('option:selected').text();
@@ -40,12 +40,12 @@ $(document).on('rex:ready', function() {
         }
         
         // Prüfen ob diese Sprache bereits existiert
-        if (container.find('.lang-translation-item[data-clang-id="' + selectedClangId + '"]').length > 0) {
+        if (container.find('.meta_lang_translation_item[data-clang-id="' + selectedClangId + '"]').length > 0) {
             alert('Diese Sprache wurde bereits hinzugefügt.');
             return;
         }
         
-        var newValueInput = container.find('.new-translation-input, .new-translation-textarea');
+        var newValueInput = container.find('.meta_lang_new_translation_input, .meta_lang_new_translation_textarea');
         var newValue = newValueInput.val();
         
         console.log('=== TEXT INPUT DEBUG ===');
@@ -63,18 +63,18 @@ $(document).on('rex:ready', function() {
         }
         
         // Neue Übersetzung erstellen
-        var fieldType = container.find('.new-translation-textarea').length > 0 ? 'textarea' : 'text';
+        var fieldType = container.find('.meta_lang_new_translation_textarea').length > 0 ? 'textarea' : 'text';
         var inputHtml = '';
         
         if (fieldType === 'textarea') {
-            inputHtml = '<textarea class="form-control lang-textarea" rows="4" cols="50">' + 
+            inputHtml = '<textarea class="form-control meta_lang_textarea" rows="4" cols="50">' + 
                        escapeHtml(newValue) + '</textarea>';
         } else {
-            inputHtml = '<input type="text" class="form-control lang-input" value="' + 
+            inputHtml = '<input type="text" class="form-control meta_lang_input" value="' + 
                        escapeHtml(newValue) + '" placeholder="' + escapeHtml(selectedLangName) + ' Text..." />';
         }
         
-        var newItem = $('<div class="lang-translation-item" data-clang-id="' + selectedClangId + '" ' +
+        var newItem = $('<div class="meta_lang_translation_item" data-clang-id="' + selectedClangId + '" ' +
                        'style="margin-bottom: 10px; padding: 10px; border: 1px solid #ddd; border-radius: 4px;">' +
                        '<div class="row">' +
                        '<div class="col-sm-3">' +
@@ -91,13 +91,13 @@ $(document).on('rex:ready', function() {
                        '</div>' +
                        '</div>');
         
-        container.find('.lang-translations').append(newItem);
+        container.find('.meta_lang_translations').append(newItem);
         
         // Ausgewählte Option aus Select entfernen
         select.find('option[value="' + selectedClangId + '"]').remove();
         
         // Eingabefeld zurücksetzen
-        container.find('.new-translation-input, .new-translation-textarea').val('');
+        container.find('.meta_lang_new_translation_input, .meta_lang_new_translation_textarea').val('');
         
         // Select auf erste verfügbare Option setzen (nicht die leere Option)
         var firstAvailableOption = select.find('option[value!=""]:first');
@@ -109,7 +109,7 @@ $(document).on('rex:ready', function() {
         
         // Wenn keine Sprachen mehr verfügbar, Add-Sektion ausblenden
         if (select.find('option').length === 0) {
-            container.find('.add-translation-section').hide();
+            container.find('.meta_lang_add_translation_section').hide();
         }
         
         updateHiddenField(container);
@@ -117,8 +117,8 @@ $(document).on('rex:ready', function() {
     
     // Übersetzung entfernen
     $(document).on('click', '.remove-translation', function() {
-        var item = $(this).closest('.lang-translation-item');
-        var container = $(this).closest('.metainfo-lang-field');
+        var item = $(this).closest('.meta_lang_translation_item');
+        var container = $(this).closest('.meta_lang_field');
         var clangId = item.data('clang-id');
         var langName = item.find('label').text().trim();
         
@@ -127,7 +127,7 @@ $(document).on('rex:ready', function() {
         select.append('<option value="' + clangId + '">' + langName + '</option>');
         
         // Add-Sektion wieder einblenden falls versteckt
-        container.find('.add-translation-section').show();
+        container.find('.meta_lang_add_translation_section').show();
         
         // Item entfernen
         item.remove();
@@ -136,23 +136,23 @@ $(document).on('rex:ready', function() {
     });
     
     // Input-Änderungen verfolgen
-    $(document).on('input change', '.lang-input, .lang-textarea', function() {
-        var container = $(this).closest('.metainfo-lang-field');
+    $(document).on('input change', '.meta_lang_input, .meta_lang_textarea', function() {
+        var container = $(this).closest('.meta_lang_field');
         updateHiddenField(container);
     });
     
     // Verstecktes Feld bei Seitenladung aktualisieren
-    $('.metainfo-lang-field').each(function() {
+    $('.meta_lang_field').each(function() {
         updateHiddenField($(this));
     });
     
     function updateHiddenField(container) {
         var data = [];
         
-        container.find('.lang-translation-item').each(function() {
+        container.find('.meta_lang_translation_item').each(function() {
             var item = $(this);
             var clangId = parseInt(item.data('clang-id'));
-            var input = item.find('.lang-input, .lang-textarea');
+            var input = item.find('.meta_lang_input, .meta_lang_textarea');
             var value = input.val() || '';
             
             if (value.trim()) {

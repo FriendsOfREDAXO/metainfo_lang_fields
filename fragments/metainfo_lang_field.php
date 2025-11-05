@@ -28,7 +28,7 @@ $availableLanguages = \FriendsOfRedaxo\MetaInfoLangFields\MetainfoLangHelper::ge
 $allLanguages = \FriendsOfRedaxo\MetaInfoLangFields\MetainfoLangHelper::getActiveLanguages();
 ?>
 
-<div class="metainfo-lang-field" data-field-name="<?= rex_escape($fieldName) ?>" style="background: rgba(255, 255, 255, 0.6); padding: 15px; border-radius: 8px; margin-bottom: 15px; border: 1px solid rgba(0, 0, 0, 0.1);">
+<div class="meta_lang_field" data-field-name="<?= rex_escape($fieldName) ?>" style="background: rgba(255, 255, 255, 0.6); padding: 15px; border-radius: 8px; margin-bottom: 15px; border: 1px solid rgba(0, 0, 0, 0.1);">
     
     
     <?php if (!empty($fieldLabel)): ?>
@@ -54,7 +54,7 @@ $allLanguages = \FriendsOfRedaxo\MetaInfoLangFields\MetainfoLangHelper::getActiv
     <input type="hidden" name="<?= rex_escape($fieldName) ?>" value="" />
     
     <!-- Existierende Übersetzungen -->
-    <div class="lang-translations">
+    <div class="meta_lang_translations">
         <?php foreach ($languageData as $index => $translation): ?>
             <?php 
             $clangId = $translation['clang_id'];
@@ -62,7 +62,7 @@ $allLanguages = \FriendsOfRedaxo\MetaInfoLangFields\MetainfoLangHelper::getActiv
             $language = $allLanguages[$clangId] ?? null;
             ?>
             <?php if ($language): ?>
-            <div class="lang-translation-item" data-clang-id="<?= $clangId ?>" style="margin-bottom: 10px; padding: 10px; border: 1px solid #ddd; border-radius: 4px;">
+            <div class="meta_lang_translation_item" data-clang-id="<?= $clangId ?>" style="margin-bottom: 10px; padding: 10px; border: 1px solid #ddd; border-radius: 4px;">
                 <div class="row">
                     <div class="col-sm-3">
                         <label class="control-label" style="margin-top: 7px;">
@@ -72,11 +72,11 @@ $allLanguages = \FriendsOfRedaxo\MetaInfoLangFields\MetainfoLangHelper::getActiv
                     </div>
                     <div class="col-sm-8">
                         <?php if ($fieldType === 'textarea'): ?>
-                            <textarea class="<?= rex_escape($fieldClass) ?> lang-textarea" 
+                            <textarea class="<?= rex_escape($fieldClass) ?> meta_lang_textarea" 
                                       rows="4" cols="50"<?= $additionalAttrsString ?>><?= rex_escape($langValue) ?></textarea>
                         <?php else: ?>
                             <input type="text" 
-                                   class="<?= rex_escape($fieldClass) ?> lang-input" 
+                                   class="<?= rex_escape($fieldClass) ?> meta_lang_input" 
                                    value="<?= rex_escape($langValue) ?>" 
                                    placeholder="<?= rex_escape($language->getName()) ?> Text..."<?= $additionalAttrsString ?> />
                         <?php endif; ?>
@@ -97,13 +97,13 @@ $allLanguages = \FriendsOfRedaxo\MetaInfoLangFields\MetainfoLangHelper::getActiv
     
     <!-- Neue Übersetzung hinzufügen -->
     <?php if (!empty($availableLanguages)): ?>
-    <div class="add-translation-section" style="margin-top: 15px; padding: 10px; border: 2px dashed #ccc; border-radius: 4px; background: #f9f9f9;">
+    <div class="meta_lang_add_translation_section" style="margin-top: 15px; padding: 10px; border: 2px dashed #ccc; border-radius: 4px; background: #f9f9f9;">
         <div class="row">
             <div class="col-sm-3">
                 <label class="control-label" style="margin-top: 7px;">Neue Sprache:</label>
             </div>
             <div class="col-sm-3">
-                <select name="new_lang_select" class="form-control lang-select">
+                <select name="new_lang_select" class="form-control meta_lang_select">
                     <option value="">Sprache wählen...</option>
                     <?php foreach ($availableLanguages as $lang): ?>
                         <option value="<?= $lang->getId() ?>">
@@ -114,12 +114,12 @@ $allLanguages = \FriendsOfRedaxo\MetaInfoLangFields\MetainfoLangHelper::getActiv
             </div>
             <div class="col-sm-5">
                 <?php if ($fieldType === 'textarea'): ?>
-                    <textarea class="<?= rex_escape($fieldClass) ?> new-translation-textarea" 
+                    <textarea class="<?= rex_escape($fieldClass) ?> meta_lang_new_translation_textarea" 
                               rows="4" cols="50" 
                               placeholder="Neue Übersetzung..."<?= $additionalAttrsString ?>></textarea>
                 <?php else: ?>
                     <input type="text" 
-                           class="<?= rex_escape($fieldClass) ?> new-translation-input" 
+                           class="<?= rex_escape($fieldClass) ?> meta_lang_new_translation_input" 
                            placeholder="Neue Übersetzung..."<?= $additionalAttrsString ?> />
                 <?php endif; ?>
             </div>
