@@ -110,7 +110,7 @@ class MetainfoLangHelper
     public static function getLanguageSelectHtml(string $name, int $selectedId = null): string
     {
         $languages = self::getActiveLanguages();
-        $html = '<select name="' . \rex_escape($name) . '" class="form-control lang-select">';
+        $html = '<select name="' . \rex_escape($name) . '" class="form-control meta_lang_select">';
         $html .= '<option value="">Sprache wählen...</option>';
         
         foreach ($languages as $lang) {

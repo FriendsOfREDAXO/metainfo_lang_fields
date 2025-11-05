@@ -2,7 +2,7 @@
 $(document).on('rex:ready', function() {
     console.log('ALL mode: Initializing with Bootstrap Collapse');
     
-    var containers = $('.metainfo-lang-field-all');
+    var containers = $('.meta_lang_field_all');
     console.log('ALL mode: Found containers:', containers.length);
     
     if (containers.length === 0) {
@@ -18,7 +18,7 @@ $(document).on('rex:ready', function() {
         var fieldName = container.data('field-name');
         
         // Standard Input Handler für alle Eingabefelder (für normale Textfelder)
-        container.find('.lang-field-input').on('input change', function() {
+        container.find('.meta_lang_field_input').on('input change', function() {
             updateHiddenFieldAll(container);
         });
         
@@ -62,7 +62,7 @@ $(document).on('rex:ready', function() {
     }
     
     function syncAllCKE5Data() {
-        $('.metainfo-lang-field-all').each(function() {
+        $('.meta_lang_field_all').each(function() {
             var container = $(this);
             syncCKE5DataToTextareas(container);
             updateHiddenFieldAll(container);
@@ -70,7 +70,7 @@ $(document).on('rex:ready', function() {
     }
     
     function syncCKE5DataToTextareas(container) {
-        container.find('.lang-field-input.cke5-editor').each(function() {
+        container.find('.meta_lang_field_input.cke5-editor').each(function() {
             var $textarea = $(this);
             var textarea = this;
             
@@ -116,7 +116,7 @@ $(document).on('rex:ready', function() {
         console.log('=== UPDATE HIDDEN FIELD DEBUG ===');
         console.log('Container field name:', fieldName);
         
-        container.find('.lang-field-input').each(function() {
+        container.find('.meta_lang_field_input').each(function() {
             var input = $(this);
             var clangId = parseInt(input.data('clang-id'));
             var value = input.val() || '';
