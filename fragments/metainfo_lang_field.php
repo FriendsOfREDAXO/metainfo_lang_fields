@@ -23,9 +23,9 @@ $generateAdditionalAttrs = function($additionalAttributes) {
 $additionalAttrsString = $generateAdditionalAttrs($additionalAttributes);
 
 // Sprachdaten parsen
-$languageData = \KLXM\MetaInfoLangFields\MetainfoLangHelper::normalizeLanguageData($fieldValue);
-$availableLanguages = \KLXM\MetaInfoLangFields\MetainfoLangHelper::getAvailableLanguages($languageData);
-$allLanguages = \KLXM\MetaInfoLangFields\MetainfoLangHelper::getActiveLanguages();
+$languageData = \FriendsOfRedaxo\MetaInfoLangFields\MetainfoLangHelper::normalizeLanguageData($fieldValue);
+$availableLanguages = \FriendsOfRedaxo\MetaInfoLangFields\MetainfoLangHelper::getAvailableLanguages($languageData);
+$allLanguages = \FriendsOfRedaxo\MetaInfoLangFields\MetainfoLangHelper::getActiveLanguages();
 ?>
 
 <div class="metainfo-lang-field" data-field-name="<?= rex_escape($fieldName) ?>" style="background: rgba(255, 255, 255, 0.6); padding: 15px; border-radius: 8px; margin-bottom: 15px; border: 1px solid rgba(0, 0, 0, 0.1);">
