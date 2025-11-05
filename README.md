@@ -13,7 +13,6 @@ Ein REDAXO Add-on für mehrsprachige Metainfo-Felder mit zwei verschiedenen Benu
 - 📝 JSON-basierte Speicherung der Sprachdaten  
 - 🎛️ Zwei verschiedene Benutzeroberflächen je nach Bedarf
 - 🔧 Nahtlose Integration in alle REDAXO-Bereiche (Struktur, Medienpool, Content)
-- 🎨 Moderne Bootstrap-basierte UI mit Font Awesome Icons
 - 📱 Responsive Design
 - 🚀 Praktische Helper-Methoden für Frontend-Ausgabe (Artikel, Medien, Kategorien)
 - 🔄 Automatische Fallback-Mechanismen auf Standardsprache
