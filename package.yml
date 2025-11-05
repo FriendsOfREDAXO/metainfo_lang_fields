@@ -1,11 +1,9 @@
 package: metainfo_lang_fields
 version: '1.0.0'
-author: 'Thomas Skerbis'
-author_email: 'thomas@klxm.de'
+author: 'Friends Of REDAXO'
 description: 'Mehrsprachige Metainfo-Felder mit zwei Benutzeroberflächen'
 license: 'MIT'
-supportpage: 'https://github.com/klxmcrossmedia/metainfo-lang-fields'
-website: 'https://klxm.de'
+supportpage: 'https://github.com/FriendsOfREDAXO/metainfo_lang_fields'
 
 page:
     title: 'Metainfo Lang Fields'
