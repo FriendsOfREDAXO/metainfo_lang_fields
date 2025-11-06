@@ -1,7 +1,52 @@
 /* Metainfo Lang Fields CSS */
 
+/* CSS Variables für Light/Dark Theme Support */
+:root {
+    --mlf-border-color: #ddd;
+    --mlf-bg-color: rgba(249, 249, 249, 0.8);
+    --mlf-hover-bg: #f5f5f5;
+    --mlf-add-border: #ccc;
+    --mlf-add-bg: #fafafa;
+    --mlf-add-hover-bg: #f0f0f0;
+    --mlf-add-hover-border: #bbb;
+    --mlf-text-color: #333;
+    --mlf-wrapper-bg: rgba(255, 255, 255, 0.6);
+}
+
+/* Dark Mode */
+body.rex-theme-dark {
+    --mlf-border-color: #404448;
+    --mlf-bg-color: rgba(44, 49, 54, 0.8);
+    --mlf-hover-bg: #35393d;
+    --mlf-add-border: #404448;
+    --mlf-add-bg: #2c3136;
+    --mlf-add-hover-bg: #35393d;
+    --mlf-add-hover-border: #4a4e53;
+    --mlf-text-color: #f2f2f2;
+    --mlf-wrapper-bg: rgba(44, 49, 54, 0.6);
+}
+
+/* Prefer dark theme support (Theme "auto" oder kein explizites Theme) */
+@media (prefers-color-scheme: dark) {
+    body:not(.rex-theme-light):not(.rex-theme-dark) {
+        --mlf-border-color: #404448;
+        --mlf-bg-color: rgba(44, 49, 54, 0.8);
+        --mlf-hover-bg: #35393d;
+        --mlf-add-border: #404448;
+        --mlf-add-bg: #2c3136;
+        --mlf-add-hover-bg: #35393d;
+        --mlf-add-hover-border: #4a4e53;
+        --mlf-text-color: #f2f2f2;
+        --mlf-wrapper-bg: rgba(44, 49, 54, 0.6);
+    }
+}
+
 .meta_lang_field {
     margin-bottom: 15px;
+    background: var(--mlf-wrapper-bg);
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid var(--mlf-border-color);
 }
 
 .meta_lang_translations {
@@ -11,19 +56,57 @@
 .meta_lang_translation_item {
     margin-bottom: 10px;
     padding: 10px;
-    border: 1px solid #ddd;
+    border: 1px solid var(--mlf-border-color);
     border-radius: 4px;
-    background-color: #f9f9f9;
+    background-color: var(--mlf-bg-color);
 }
 
 .meta_lang_translation_item:hover {
-    background-color: #f5f5f5;
+    background-color: var(--mlf-hover-bg);
 }
 
 .meta_lang_translation_item label {
     font-weight: 600;
     margin-bottom: 5px;
     display: block;
+    color: var(--mlf-text-color);
+}
+
+/* Label-Stile */
+.meta_lang_main_label {
+    margin-bottom: 15px;
+    display: block;
+    font-weight: bold;
+    font-size: 14px;
+    color: var(--mlf-text-color);
+}
+
+.meta_lang_add_label {
+    margin-top: 7px;
+    color: var(--mlf-text-color);
+}
+
+.meta_lang_control_label {
+    margin-top: 7px;
+    color: var(--mlf-text-color);
+}
+
+.meta_lang_flag_icon {
+    margin-right: 5px;
+}
+
+.meta_lang_flag_icon_primary {
+    margin-right: 5px;
+    color: #28a745;
+}
+
+.meta_lang_flag_icon_secondary {
+    margin-right: 5px;
+    color: #6c757d;
+}
+
+.meta_lang_button {
+    margin-top: 2px;
 }
 
 .meta_lang_input,
@@ -33,15 +116,42 @@
 
 .meta_lang_add_translation_section {
     padding: 10px;
-    border: 2px dashed #ccc;
+    border: 2px dashed var(--mlf-add-border);
     border-radius: 4px;
-    background-color: #fafafa;
-    margin-top: 10px;
+    background-color: var(--mlf-add-bg);
+    margin-top: 15px;
 }
 
 .meta_lang_add_translation_section:hover {
-    background-color: #f0f0f0;
-    border-color: #bbb;
+    background-color: var(--mlf-add-hover-bg);
+    border-color: var(--mlf-add-hover-border);
+}
+
+/* Styles für "Alle Sprachen" Modus */
+.meta_lang_field_all {
+    margin-bottom: 15px;
+    background: var(--mlf-wrapper-bg);
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid var(--mlf-border-color);
+}
+
+.meta_lang_field_row {
+    margin-bottom: 10px;
+    padding: 8px;
+    border: 1px solid var(--mlf-border-color);
+    border-radius: 4px;
+    background-color: var(--mlf-bg-color);
+}
+
+.meta_lang_field_row_primary {
+    margin-bottom: 15px;
+    background-color: var(--mlf-hover-bg);
+}
+
+.meta_lang_field_row_secondary {
+    margin-bottom: 10px;
+    background-color: var(--mlf-bg-color);
 }
 
 .meta_lang_select {

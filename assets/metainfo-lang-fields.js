@@ -74,19 +74,18 @@ $(document).on('rex:ready', function() {
                        escapeHtml(newValue) + '" placeholder="' + escapeHtml(selectedLangName) + ' Text..." />';
         }
         
-        var newItem = $('<div class="meta_lang_translation_item" data-clang-id="' + selectedClangId + '" ' +
-                       'style="margin-bottom: 10px; padding: 10px; border: 1px solid #ddd; border-radius: 4px;">' +
+        var newItem = $('<div class="meta_lang_translation_item" data-clang-id="' + selectedClangId + '">' +
                        '<div class="row">' +
                        '<div class="col-sm-3">' +
-                       '<label class="control-label" style="margin-top: 7px;">' +
-                       '<i class="fa fa-flag" style="margin-right: 5px;"></i>' +
+                       '<label class="control-label meta_lang_control_label">' +
+                       '<i class="fa fa-flag meta_lang_flag_icon"></i>' +
                        escapeHtml(selectedLangName) +
                        '</label>' +
                        '</div>' +
                        '<div class="col-sm-8">' + inputHtml + '</div>' +
                        '<div class="col-sm-1">' +
-                       '<button type="button" class="btn btn-danger btn-sm remove-translation" ' +
-                       'title="Übersetzung entfernen" style="margin-top: 2px;">✗</button>' +
+                       '<button type="button" class="btn btn-danger btn-sm remove-translation meta_lang_button" ' +
+                       'title="Übersetzung entfernen">✗</button>' +
                        '</div>' +
                        '</div>' +
                        '</div>');

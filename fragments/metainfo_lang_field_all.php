@@ -39,10 +39,10 @@ if (is_array($languageData)) {
 ?>
 
 
-<div class="meta_lang_field_all" data-field-name="<?= rex_escape($fieldName) ?>" style="background: rgba(255, 255, 255, 0.6); padding: 15px; border-radius: 8px; margin-bottom: 15px; border: 1px solid rgba(0, 0, 0, 0.1);">
+<div class="meta_lang_field_all" data-field-name="<?= rex_escape($fieldName) ?>">
     
     <?php if (!empty($fieldLabel)): ?>
-    <label class="control-label" style="margin-bottom: 15px; display: block; font-weight: bold; font-size: 14px;">
+    <label class="control-label meta_lang_main_label">
         <?php
         // Label-Text aus HTML extrahieren
         $cleanLabel = $fieldLabel;
@@ -68,11 +68,11 @@ if (is_array($languageData)) {
     <?php $firstClangId = $firstLang->getId(); ?>
     <?php $firstValue = $translations[$firstClangId] ?? ''; ?>
     
-    <div class="meta_lang_field_row" style="margin-bottom: 15px; padding: 8px; border: 1px solid #ddd; border-radius: 4px; background: #f8f9fa;">
+    <div class="meta_lang_field_row meta_lang_field_row_primary">
         <div class="row">
             <div class="col-sm-3">
-                <label class="control-label" style="margin-top: 7px;">
-                    <i class="fa fa-flag" style="margin-right: 5px; color: #28a745;"></i>
+                <label class="control-label meta_lang_control_label">
+                    <i class="fa fa-flag meta_lang_flag_icon_primary"></i>
                     <?= rex_escape($firstLang->getName() . ' (' . $firstLang->getCode() . ')') ?>
                     <span class="text-muted">(Hauptsprache)</span>
                 </label>
@@ -116,11 +116,11 @@ if (is_array($languageData)) {
             $clangId = $language->getId();
             $langValue = $translations[$clangId] ?? '';
             ?>
-            <div class="meta_lang_field_row" style="margin-bottom: 10px; padding: 8px; border: 1px solid #ddd; border-radius: 4px; background: #ffffff;">
+            <div class="meta_lang_field_row meta_lang_field_row_secondary">
                 <div class="row">
                     <div class="col-sm-3">
-                        <label class="control-label" style="margin-top: 7px;">
-                            <i class="fa fa-flag" style="margin-right: 5px; color: #6c757d;"></i>
+                        <label class="control-label meta_lang_control_label">
+                            <i class="fa fa-flag meta_lang_flag_icon_secondary"></i>
                             <?= rex_escape($language->getName() . ' (' . $language->getCode() . ')') ?>
                         </label>
                     </div>
