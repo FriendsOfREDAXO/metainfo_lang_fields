@@ -48,12 +48,12 @@ $(document).off('click.metainfoLangFields', '.add-translation').on('click.metain
         alert('Bitte wählen Sie eine Sprache aus der Liste aus.');
         return;
     }
-        
-        // Prüfen ob diese Sprache bereits existiert
-        if (container.find('.meta_lang_translation_item[data-clang-id="' + selectedClangId + '"]').length > 0) {
-            alert('Diese Sprache wurde bereits hinzugefügt.');
-            return;
-        }
+    
+    // Prüfen ob diese Sprache bereits existiert
+    if (container.find('.meta_lang_translation_item[data-clang-id="' + selectedClangId + '"]').length > 0) {
+        alert('Diese Sprache wurde bereits hinzugefügt.');
+        return;
+    }
         
         // Neue Übersetzung erstellen
         var fieldType = container.find('.meta_lang_new_translation_textarea').length > 0 ? 'textarea' : 'text';
@@ -108,7 +108,7 @@ $(document).off('click.metainfoLangFields', '.add-translation').on('click.metain
 $(document).off('click.metainfoLangFields', '.remove-translation').on('click.metainfoLangFields', '.remove-translation', function() {
     var item = $(this).closest('.meta_lang_translation_item');
     var container = $(this).closest('.meta_lang_field');
-    var clangId = item.data('clang-id');
+    var clangId = parseInt(item.data('clang-id'), 10);
     // Get language name from data attribute instead of parsing text
     var langName = item.data('lang-name') || item.find('label').text().trim();
         
