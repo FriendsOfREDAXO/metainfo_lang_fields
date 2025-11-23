@@ -1,9 +1,6 @@
 // JavaScript für "Alle Sprachen" Modus - Bootstrap Collapse
 $(document).on('rex:ready', function() {
-    console.log('ALL mode: Initializing with Bootstrap Collapse');
-    
     var containers = $('.meta_lang_field_all');
-    console.log('ALL mode: Found containers:', containers.length);
     
     if (containers.length === 0) {
         return;
@@ -30,15 +27,12 @@ $(document).on('rex:ready', function() {
     });
     
     function setupCKE5Handlers(container, fieldName) {
-        console.log('Setting up CKE5 handlers for container:', fieldName);
-        
         // Einfacher aber effektiver Ansatz: Form Submit abfangen
         var form = container.closest('form');
         if (form.length > 0 && !form.data('cke5-handler-attached')) {
             form.data('cke5-handler-attached', true);
             
             form.on('submit', function() {
-                console.log('Form submit detected - syncing CKE5 data');
                 syncAllCKE5Data();
             });
         }
@@ -53,7 +47,6 @@ $(document).on('rex:ready', function() {
         // Blur-Events auf CKE5 Editoren abfangen
         setTimeout(function() {
             container.find('.ck-editor__editable').on('blur', function() {
-                console.log('CKE5 editor blur detected');
                 setTimeout(function() {
                     syncAllCKE5Data();
                 }, 100);
@@ -100,7 +93,6 @@ $(document).on('rex:ready', function() {
                     
                     // Nur aktualisieren wenn sich der Inhalt geändert hat
                     if (htmlContent !== textarea.value) {
-                        console.log('Syncing CKE5 content for clang:', $textarea.data('clang-id'), htmlContent.substring(0, 50));
                         textarea.value = htmlContent || '';
                         $textarea.trigger('change');
                     }
@@ -113,16 +105,11 @@ $(document).on('rex:ready', function() {
         var data = [];
         var fieldName = container.data('field-name');
         
-        console.log('=== UPDATE HIDDEN FIELD DEBUG ===');
-        console.log('Container field name:', fieldName);
-        
         container.find('.meta_lang_field_input').each(function() {
             var input = $(this);
             var clangId = parseInt(input.data('clang-id'));
             var value = input.val() || '';
             var isCKE5 = input.hasClass('cke5-editor');
-            
-            console.log('Field - clang:', clangId, 'isCKE5:', isCKE5, 'value length:', value.length, 'preview:', value.substring(0, 50));
             
             // Für CKE5: Wert kann auch im textarea selbst stehen nach der Synchronisierung
             if (value.trim()) {
@@ -135,15 +122,10 @@ $(document).on('rex:ready', function() {
         
         var jsonString = JSON.stringify(data);
         container.find('input[type="hidden"]').val(jsonString);
-        
-        console.log('Final JSON:', jsonString);
-        console.log('Hidden field updated for:', fieldName);
-        console.log('=== END DEBUG ===');
     }
     
     // Form Submit Handler - stelle sicher dass CKE5 Daten gespeichert werden
     $('form').on('submit', function() {
-        console.log('FORM SUBMIT - Final sync of all CKE5 data');
         syncAllCKE5Data();
     });
     
@@ -151,7 +133,6 @@ $(document).on('rex:ready', function() {
     if (window.location.search.indexOf('debug=1') !== -1) {
         $('body').append('<button type="button" id="debug-sync-cke5" style="position:fixed;top:10px;right:10px;z-index:9999;background:red;color:white;padding:10px;">SYNC CKE5</button>');
         $('#debug-sync-cke5').on('click', function() {
-            console.log('Manual CKE5 sync triggered');
             syncAllCKE5Data();
             alert('CKE5 data synced - check console for details');
         });
