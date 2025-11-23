@@ -25,53 +25,29 @@ $(document).off('click.metainfoLangFields', '.add-translation').on('click.metain
     var select = container.find('select[name="new_lang_select"]');
     var selectedClangId = select.val();
     var selectedLangName = select.find('option:selected').text();
-        
-        console.log('=== ADD TRANSLATION DEBUG ===');
-        console.log('Container found:', container.length);
-        console.log('Select element found:', select.length);
-        console.log('Select HTML:', select[0] ? select[0].outerHTML : 'not found');
-        console.log('All options:', select.find('option').length);
-        console.log('Selected option index:', select[0] ? select[0].selectedIndex : 'no select');
-        console.log('Selected value raw:', selectedClangId);
-        console.log('Selected value type:', typeof selectedClangId);
-        console.log('Selected text:', selectedLangName);
-        console.log('==============================');
-        
-        var newValueInput = container.find('.meta_lang_new_translation_input, .meta_lang_new_translation_textarea');
-        var newValue = newValueInput.val();
-        
-        console.log('=== TEXT INPUT DEBUG ===');
-        console.log('Input element found:', newValueInput.length);
-        console.log('Input HTML:', newValueInput[0] ? newValueInput[0].outerHTML : 'not found');
-        console.log('Raw value:', "'" + newValue + "'");
-        console.log('Value length:', newValue ? newValue.length : 0);
-        console.log('Trimmed value:', "'" + (newValue ? newValue.trim() : '') + "'");
-        console.log('Trimmed length:', newValue ? newValue.trim().length : 0);
-        console.log('========================');
-        
-        // Wenn kein Wert eingegeben wurde, nur Warnung wenn auch keine Sprache gewählt
-        if (!newValue || !newValue.trim()) {
-            if (!selectedClangId || selectedClangId === '') {
-                // Beide leer - nichts zu tun
-                return;
-            }
-            // Text fehlt aber Sprache gewählt - prüfe erst ob bereits vorhanden
-            if (container.find('.meta_lang_translation_item[data-clang-id="' + selectedClangId + '"]').length > 0) {
-                alert('Diese Sprache wurde bereits hinzugefügt.');
-                return;
-            }
-            alert('Bitte geben Sie einen Text ein.');
-            return;
-        }
-        
-        // Zusätzliche Prüfung: Gibt es überhaupt Optionen außer der ersten?
-        var availableOptions = select.find('option[value!=""]');
-        console.log('Available options (not empty):', availableOptions.length);
-        
+    
+    var newValueInput = container.find('.meta_lang_new_translation_input, .meta_lang_new_translation_textarea');
+    var newValue = newValueInput.val();
+    
+    // Wenn kein Wert eingegeben wurde, nur Warnung wenn auch keine Sprache gewählt
+    if (!newValue || !newValue.trim()) {
         if (!selectedClangId || selectedClangId === '') {
-            alert('Bitte wählen Sie eine Sprache aus der Liste aus.');
+            // Beide leer - nichts zu tun
             return;
         }
+        // Text fehlt aber Sprache gewählt - prüfe erst ob bereits vorhanden
+        if (container.find('.meta_lang_translation_item[data-clang-id="' + selectedClangId + '"]').length > 0) {
+            alert('Diese Sprache wurde bereits hinzugefügt.');
+            return;
+        }
+        alert('Bitte geben Sie einen Text ein.');
+        return;
+    }
+    
+    if (!selectedClangId || selectedClangId === '') {
+        alert('Bitte wählen Sie eine Sprache aus der Liste aus.');
+        return;
+    }
         
         // Prüfen ob diese Sprache bereits existiert
         if (container.find('.meta_lang_translation_item[data-clang-id="' + selectedClangId + '"]').length > 0) {
@@ -146,7 +122,8 @@ $(document).off('click.metainfoLangFields', '.remove-translation').on('click.met
     // Option an der richtigen Stelle einfügen (sortiert nach clang_id)
     var inserted = false;
     select.find('option[value!=""]').each(function() {
-        if (parseInt($(this).val()) > clangId) {
+        var optionClangId = parseInt($(this).val(), 10);
+        if (!isNaN(optionClangId) && optionClangId > clangId) {
             $(this).before(newOption);
             inserted = true;
             return false;
@@ -188,7 +165,7 @@ function updateHiddenField(container) {
     
     container.find('.meta_lang_translation_item').each(function() {
         var item = $(this);
-        var clangId = parseInt(item.data('clang-id'));
+        var clangId = parseInt(item.data('clang-id'), 10);
         var input = item.find('.meta_lang_input, .meta_lang_textarea');
         var value = input.val() || '';
         
@@ -202,7 +179,6 @@ function updateHiddenField(container) {
     
     var jsonString = JSON.stringify(data);
     container.find('input[type="hidden"]').val(jsonString);
-    console.log('Updated hidden field:', jsonString);
 }
 
 function escapeHtml(text) {
