@@ -14,8 +14,24 @@ $(document).on('rex:ready', function() {
 // Event Handlers außerhalb von rex:ready um Duplikate zu vermeiden
 // Verwende Namespacing um sicherzustellen dass Handler nur einmal registriert werden
 $(document).off('submit.metainfoLangFields').on('submit.metainfoLangFields', 'form', function() {
+    // Vor dem Absenden: automatisch hinzufügen wenn Sprache und Text ausgefüllt sind
     $('.meta_lang_field').each(function() {
-        updateHiddenField($(this));
+        var container = $(this);
+        var select = container.find('select[name="new_lang_select"]');
+        var selectedClangId = select.val();
+        var newValueInput = container.find('.meta_lang_new_translation_input, .meta_lang_new_translation_textarea');
+        var newValue = newValueInput.val();
+        
+        // Wenn beides ausgefüllt ist, automatisch hinzufügen
+        if (selectedClangId && selectedClangId !== '' && newValue && newValue.trim()) {
+            // Prüfen ob diese Sprache noch nicht existiert
+            if (container.find('.meta_lang_translation_item[data-clang-id="' + selectedClangId + '"]').length === 0) {
+                // Automatisch hinzufügen ohne Alert
+                addTranslation(container, selectedClangId, newValue.trim());
+            }
+        }
+        
+        updateHiddenField(container);
     });
 });
 
@@ -24,7 +40,6 @@ $(document).off('click.metainfoLangFields', '.add-translation').on('click.metain
     var container = $(this).closest('.meta_lang_field');
     var select = container.find('select[name="new_lang_select"]');
     var selectedClangId = select.val();
-    var selectedLangName = select.find('option:selected').text();
     
     var newValueInput = container.find('.meta_lang_new_translation_input, .meta_lang_new_translation_textarea');
     var newValue = newValueInput.val();
@@ -54,52 +69,9 @@ $(document).off('click.metainfoLangFields', '.add-translation').on('click.metain
         alert('Diese Sprache wurde bereits hinzugefügt.');
         return;
     }
-        
-        // Neue Übersetzung erstellen
-        var fieldType = container.find('.meta_lang_new_translation_textarea').length > 0 ? 'textarea' : 'text';
-        var inputHtml = '';
-        
-        if (fieldType === 'textarea') {
-            inputHtml = '<textarea class="form-control meta_lang_textarea" rows="4" cols="50">' + 
-                       escapeHtml(newValue) + '</textarea>';
-        } else {
-            inputHtml = '<input type="text" class="form-control meta_lang_input" value="' + 
-                       escapeHtml(newValue) + '" placeholder="' + escapeHtml(selectedLangName) + ' Text..." />';
-        }
-        
-        var newItem = $('<div class="meta_lang_translation_item" data-clang-id="' + selectedClangId + '" data-lang-name="' + escapeHtml(selectedLangName) + '">' +
-                       '<div class="row">' +
-                       '<div class="col-sm-3">' +
-                       '<label class="control-label meta_lang_control_label">' +
-                       '<i class="fa fa-flag meta_lang_flag_icon"></i>' +
-                       escapeHtml(selectedLangName) +
-                       '</label>' +
-                       '</div>' +
-                       '<div class="col-sm-8">' + inputHtml + '</div>' +
-                       '<div class="col-sm-1">' +
-                       '<button type="button" class="btn btn-danger btn-sm remove-translation meta_lang_button" ' +
-                       'title="Übersetzung entfernen">✗</button>' +
-                       '</div>' +
-                       '</div>' +
-                       '</div>');
-        
-        container.find('.meta_lang_translations').append(newItem);
-        
-        // Ausgewählte Option aus Select entfernen
-        select.find('option[value="' + selectedClangId + '"]').remove();
-        
-        // Eingabefeld zurücksetzen
-        container.find('.meta_lang_new_translation_input, .meta_lang_new_translation_textarea').val('');
-        
-        // Select auf erste verfügbare Option setzen (nicht die leere Option)
-        var firstAvailableOption = select.find('option[value!=""]:first');
-        if (firstAvailableOption.length > 0) {
-            select.val(firstAvailableOption.val());
-        } else {
-            // Keine Optionen mehr verfügbar - Add-Sektion ausblenden
-            select.val('');
-            container.find('.meta_lang_add_translation_section').hide();
-        }
+    
+    // Übersetzung hinzufügen
+    addTranslation(container, selectedClangId, newValue.trim());
     
     updateHiddenField(container);
 });
@@ -152,6 +124,58 @@ $(document).off('input.metainfoLangFields change.metainfoLangFields', '.meta_lan
     var container = $(this).closest('.meta_lang_field');
     updateHiddenField(container);
 });
+
+// Helper-Funktion um eine Übersetzung hinzuzufügen
+function addTranslation(container, selectedClangId, newValue) {
+    var select = container.find('select[name="new_lang_select"]');
+    var selectedLangName = select.find('option[value="' + selectedClangId + '"]').text();
+    
+    // Neue Übersetzung erstellen
+    var fieldType = container.find('.meta_lang_new_translation_textarea').length > 0 ? 'textarea' : 'text';
+    var inputHtml = '';
+    
+    if (fieldType === 'textarea') {
+        inputHtml = '<textarea class="form-control meta_lang_textarea" rows="4" cols="50">' + 
+                   escapeHtml(newValue) + '</textarea>';
+    } else {
+        inputHtml = '<input type="text" class="form-control meta_lang_input" value="' + 
+                   escapeHtml(newValue) + '" placeholder="' + escapeHtml(selectedLangName) + ' Text..." />';
+    }
+    
+    var newItem = $('<div class="meta_lang_translation_item" data-clang-id="' + selectedClangId + '" data-lang-name="' + escapeHtml(selectedLangName) + '">' +
+                   '<div class="row">' +
+                   '<div class="col-sm-3">' +
+                   '<label class="control-label meta_lang_control_label">' +
+                   '<i class="fa fa-flag meta_lang_flag_icon"></i>' +
+                   escapeHtml(selectedLangName) +
+                   '</label>' +
+                   '</div>' +
+                   '<div class="col-sm-8">' + inputHtml + '</div>' +
+                   '<div class="col-sm-1">' +
+                   '<button type="button" class="btn btn-danger btn-sm remove-translation meta_lang_button" ' +
+                   'title="Übersetzung entfernen">✗</button>' +
+                   '</div>' +
+                   '</div>' +
+                   '</div>');
+    
+    container.find('.meta_lang_translations').append(newItem);
+    
+    // Ausgewählte Option aus Select entfernen
+    select.find('option[value="' + selectedClangId + '"]').remove();
+    
+    // Eingabefeld zurücksetzen
+    container.find('.meta_lang_new_translation_input, .meta_lang_new_translation_textarea').val('');
+    
+    // Select auf erste verfügbare Option setzen (nicht die leere Option)
+    var firstAvailableOption = select.find('option[value!=""]:first');
+    if (firstAvailableOption.length > 0) {
+        select.val(firstAvailableOption.val());
+    } else {
+        // Keine Optionen mehr verfügbar - Add-Sektion ausblenden
+        select.val('');
+        container.find('.meta_lang_add_translation_section').hide();
+    }
+}
 
 function initializeRepeaterFields() {
     // Verstecktes Feld bei Seitenladung aktualisieren
