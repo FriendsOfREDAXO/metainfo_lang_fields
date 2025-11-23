@@ -95,8 +95,7 @@ $allLanguages = \FriendsOfRedaxo\MetaInfoLangFields\MetainfoLangHelper::getActiv
     </div>
     
     <!-- Neue Übersetzung hinzufügen -->
-    <?php if (!empty($availableLanguages)): ?>
-    <div class="meta_lang_add_translation_section">
+    <div class="meta_lang_add_translation_section"<?php if (empty($availableLanguages)): ?> style="display: none;"<?php endif; ?>>
         <div class="row">
                         <div class="col-sm-3">
                 <label class="control-label meta_lang_control_label">Neue Sprache:</label>
@@ -131,5 +130,4 @@ $allLanguages = \FriendsOfRedaxo\MetaInfoLangFields\MetainfoLangHelper::getActiv
             </div>
         </div>
     </div>
-    <?php endif; ?>
 </div>
