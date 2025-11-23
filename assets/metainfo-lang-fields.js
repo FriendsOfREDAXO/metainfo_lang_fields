@@ -55,6 +55,11 @@ $(document).off('click.metainfoLangFields', '.add-translation').on('click.metain
                 // Beide leer - nichts zu tun
                 return;
             }
+            // Text fehlt aber Sprache gewählt - prüfe erst ob bereits vorhanden
+            if (container.find('.meta_lang_translation_item[data-clang-id="' + selectedClangId + '"]').length > 0) {
+                alert('Diese Sprache wurde bereits hinzugefügt.');
+                return;
+            }
             alert('Bitte geben Sie einen Text ein.');
             return;
         }
@@ -154,15 +159,12 @@ $(document).off('click.metainfoLangFields', '.remove-translation').on('click.met
     // Add-Sektion wieder einblenden falls versteckt
     container.find('.meta_lang_add_translation_section').show();
     
-    // Wenn dies das letzte Item war (jetzt 0 Einträge), auf die neu hinzugefügte Option setzen
-    if (container.find('.meta_lang_translation_item').length === 0) {
-        select.val(clangId);
+    // Wähle immer erste verfügbare Option für konsistentes Verhalten
+    var firstAvailableOption = select.find('option[value!=""]:first');
+    if (firstAvailableOption.length > 0) {
+        select.val(firstAvailableOption.val());
     } else {
-        // Ansonsten erste verfügbare Option wählen
-        var firstAvailableOption = select.find('option[value!=""]:first');
-        if (firstAvailableOption.length > 0) {
-            select.val(firstAvailableOption.val());
-        }
+        select.val('');
     }
     
     updateHiddenField(container);
