@@ -1,9 +1,6 @@
 $(document).on('rex:ready', function() {
-    console.log('metainfo-lang-fields.js loaded');
-    
     // Nur für Repeater-Modus, nicht für ALL-Modus
     if ($('.meta_lang_field_all').length > 0) {
-        console.log('ALL mode detected, skipping repeater JS');
         return;
     }
     
