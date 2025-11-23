@@ -109,6 +109,7 @@ $(document).off('click.metainfoLangFields', '.remove-translation').on('click.met
     var item = $(this).closest('.meta_lang_translation_item');
     var container = $(this).closest('.meta_lang_field');
     var clangId = parseInt(item.data('clang-id'), 10);
+    if (isNaN(clangId)) return; // Skip if clang-id is invalid
     var langName = item.data('lang-name');
         
     // Item entfernen
@@ -116,7 +117,7 @@ $(document).off('click.metainfoLangFields', '.remove-translation').on('click.met
     
     // Option zurück zum Select hinzufügen
     var select = container.find('select[name="new_lang_select"]');
-    var newOption = $('<option value="' + clangId + '">' + langName + '</option>');
+    var newOption = $('<option value="' + clangId + '">' + escapeHtml(langName) + '</option>');
     
     // Option an der richtigen Stelle einfügen (sortiert nach clang_id)
     var inserted = false;
@@ -165,6 +166,8 @@ function updateHiddenField(container) {
     container.find('.meta_lang_translation_item').each(function() {
         var item = $(this);
         var clangId = parseInt(item.data('clang-id'), 10);
+        if (isNaN(clangId)) return; // Skip invalid clang-id
+        
         var input = item.find('.meta_lang_input, .meta_lang_textarea');
         var value = input.val() || '';
         
