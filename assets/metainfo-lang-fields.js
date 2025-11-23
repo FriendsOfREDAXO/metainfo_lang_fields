@@ -86,7 +86,7 @@ $(document).off('click.metainfoLangFields', '.add-translation').on('click.metain
                        escapeHtml(newValue) + '" placeholder="' + escapeHtml(selectedLangName) + ' Text..." />';
         }
         
-        var newItem = $('<div class="meta_lang_translation_item" data-clang-id="' + selectedClangId + '">' +
+        var newItem = $('<div class="meta_lang_translation_item" data-clang-id="' + selectedClangId + '" data-lang-name="' + escapeHtml(selectedLangName) + '">' +
                        '<div class="row">' +
                        '<div class="col-sm-3">' +
                        '<label class="control-label meta_lang_control_label">' +
@@ -128,8 +128,12 @@ $(document).off('click.metainfoLangFields', '.remove-translation').on('click.met
     var item = $(this).closest('.meta_lang_translation_item');
     var container = $(this).closest('.meta_lang_field');
     var clangId = item.data('clang-id');
-    var langName = item.find('label').text().trim().replace(/^[^\w]*/, ''); // Remove icon from text
+    // Get language name from data attribute instead of parsing text
+    var langName = item.data('lang-name') || item.find('label').text().trim();
         
+    // Item entfernen
+    item.remove();
+    
     // Option zurück zum Select hinzufügen
     var select = container.find('select[name="new_lang_select"]');
     var newOption = $('<option value="' + clangId + '">' + langName + '</option>');
@@ -150,8 +154,8 @@ $(document).off('click.metainfoLangFields', '.remove-translation').on('click.met
     // Add-Sektion wieder einblenden falls versteckt
     container.find('.meta_lang_add_translation_section').show();
     
-    // Wenn keine weiteren Einträge vorhanden, auf die neu hinzugefügte Option setzen
-    if (container.find('.meta_lang_translation_item').length === 1) {
+    // Wenn dies das letzte Item war (jetzt 0 Einträge), auf die neu hinzugefügte Option setzen
+    if (container.find('.meta_lang_translation_item').length === 0) {
         select.val(clangId);
     } else {
         // Ansonsten erste verfügbare Option wählen
@@ -160,9 +164,6 @@ $(document).off('click.metainfoLangFields', '.remove-translation').on('click.met
             select.val(firstAvailableOption.val());
         }
     }
-    
-    // Item entfernen
-    item.remove();
     
     updateHiddenField(container);
 });

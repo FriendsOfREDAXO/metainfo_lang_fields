@@ -62,7 +62,7 @@ $allLanguages = \FriendsOfRedaxo\MetaInfoLangFields\MetainfoLangHelper::getActiv
             $language = $allLanguages[$clangId] ?? null;
             ?>
             <?php if ($language): ?>
-            <div class="meta_lang_translation_item" data-clang-id="<?= $clangId ?>">
+            <div class="meta_lang_translation_item" data-clang-id="<?= $clangId ?>" data-lang-name="<?= rex_escape($language->getName() . ' (' . $language->getCode() . ')') ?>">
                 <div class="row">
                     <div class="col-sm-3">
                         <label class="control-label meta_lang_control_label">
