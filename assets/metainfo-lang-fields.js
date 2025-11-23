@@ -9,20 +9,22 @@ $(document).on('rex:ready', function() {
     
     // Initialisierung durchführen
     initializeRepeaterFields();
-    
-    // Bei Form-Submit: Sicherstellen dass hidden fields aktualisiert sind
-    $(document).on('submit', 'form', function() {
-        $('.meta_lang_field').each(function() {
-            updateHiddenField($(this));
-        });
+});
+
+// Event Handlers außerhalb von rex:ready um Duplikate zu vermeiden
+// Verwende Namespacing um sicherzustellen dass Handler nur einmal registriert werden
+$(document).off('submit.metainfoLangFields').on('submit.metainfoLangFields', 'form', function() {
+    $('.meta_lang_field').each(function() {
+        updateHiddenField($(this));
     });
-    
-    // Übersetzung hinzufügen
-    $(document).on('click', '.add-translation', function() {
-        var container = $(this).closest('.meta_lang_field');
-        var select = container.find('select[name="new_lang_select"]');
-        var selectedClangId = select.val();
-        var selectedLangName = select.find('option:selected').text();
+});
+
+// Übersetzung hinzufügen
+$(document).off('click.metainfoLangFields', '.add-translation').on('click.metainfoLangFields', '.add-translation', function() {
+    var container = $(this).closest('.meta_lang_field');
+    var select = container.find('select[name="new_lang_select"]');
+    var selectedClangId = select.val();
+    var selectedLangName = select.find('option:selected').text();
         
         console.log('=== ADD TRANSLATION DEBUG ===');
         console.log('Container found:', container.length);
@@ -115,94 +117,93 @@ $(document).on('rex:ready', function() {
         } else {
             // Keine Optionen mehr verfügbar - Add-Sektion ausblenden
             select.val('');
-            container.find('.meta_lang_add_translation_section').hide();
-        }
-        
-        updateHiddenField(container);
-    });
-    
-    // Übersetzung entfernen
-    $(document).on('click', '.remove-translation', function() {
-        var item = $(this).closest('.meta_lang_translation_item');
-        var container = $(this).closest('.meta_lang_field');
-        var clangId = item.data('clang-id');
-        var langName = item.find('label').text().trim().replace(/^[^\w]*/, ''); // Remove icon from text
-        
-        // Option zurück zum Select hinzufügen
-        var select = container.find('select[name="new_lang_select"]');
-        var newOption = $('<option value="' + clangId + '">' + langName + '</option>');
-        
-        // Option an der richtigen Stelle einfügen (sortiert nach clang_id)
-        var inserted = false;
-        select.find('option[value!=""]').each(function() {
-            if (parseInt($(this).val()) > clangId) {
-                $(this).before(newOption);
-                inserted = true;
-                return false;
-            }
-        });
-        if (!inserted) {
-            select.append(newOption);
-        }
-        
-        // Add-Sektion wieder einblenden falls versteckt
-        container.find('.meta_lang_add_translation_section').show();
-        
-        // Wenn keine weiteren Einträge vorhanden, auf die neu hinzugefügte Option setzen
-        if (container.find('.meta_lang_translation_item').length === 1) {
-            select.val(clangId);
-        } else {
-            // Ansonsten erste verfügbare Option wählen
-            var firstAvailableOption = select.find('option[value!=""]:first');
-            if (firstAvailableOption.length > 0) {
-                select.val(firstAvailableOption.val());
-            }
-        }
-        
-        // Item entfernen
-        item.remove();
-        
-        updateHiddenField(container);
-    });
-    
-    // Input-Änderungen verfolgen
-    $(document).on('input change', '.meta_lang_input, .meta_lang_textarea', function() {
-        var container = $(this).closest('.meta_lang_field');
-        updateHiddenField(container);
-    });
-    
-    function initializeRepeaterFields() {
-        // Verstecktes Feld bei Seitenladung aktualisieren
-        $('.meta_lang_field').each(function() {
-            updateHiddenField($(this));
-        });
+        container.find('.meta_lang_add_translation_section').hide();
     }
     
-    function updateHiddenField(container) {
-        var data = [];
-        
-        container.find('.meta_lang_translation_item').each(function() {
-            var item = $(this);
-            var clangId = parseInt(item.data('clang-id'));
-            var input = item.find('.meta_lang_input, .meta_lang_textarea');
-            var value = input.val() || '';
-            
-            if (value.trim()) {
-                data.push({
-                    clang_id: clangId,
-                    value: value.trim()
-                });
-            }
-        });
-        
-        var jsonString = JSON.stringify(data);
-        container.find('input[type="hidden"]').val(jsonString);
-        console.log('Updated hidden field:', jsonString);
-    }
-    
-    function escapeHtml(text) {
-        var div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
-    }
+    updateHiddenField(container);
 });
+
+// Übersetzung entfernen
+$(document).off('click.metainfoLangFields', '.remove-translation').on('click.metainfoLangFields', '.remove-translation', function() {
+    var item = $(this).closest('.meta_lang_translation_item');
+    var container = $(this).closest('.meta_lang_field');
+    var clangId = item.data('clang-id');
+    var langName = item.find('label').text().trim().replace(/^[^\w]*/, ''); // Remove icon from text
+        
+    // Option zurück zum Select hinzufügen
+    var select = container.find('select[name="new_lang_select"]');
+    var newOption = $('<option value="' + clangId + '">' + langName + '</option>');
+    
+    // Option an der richtigen Stelle einfügen (sortiert nach clang_id)
+    var inserted = false;
+    select.find('option[value!=""]').each(function() {
+        if (parseInt($(this).val()) > clangId) {
+            $(this).before(newOption);
+            inserted = true;
+            return false;
+        }
+    });
+    if (!inserted) {
+        select.append(newOption);
+    }
+    
+    // Add-Sektion wieder einblenden falls versteckt
+    container.find('.meta_lang_add_translation_section').show();
+    
+    // Wenn keine weiteren Einträge vorhanden, auf die neu hinzugefügte Option setzen
+    if (container.find('.meta_lang_translation_item').length === 1) {
+        select.val(clangId);
+    } else {
+        // Ansonsten erste verfügbare Option wählen
+        var firstAvailableOption = select.find('option[value!=""]:first');
+        if (firstAvailableOption.length > 0) {
+            select.val(firstAvailableOption.val());
+        }
+    }
+    
+    // Item entfernen
+    item.remove();
+    
+    updateHiddenField(container);
+});
+
+// Input-Änderungen verfolgen
+$(document).off('input.metainfoLangFields change.metainfoLangFields', '.meta_lang_input, .meta_lang_textarea').on('input.metainfoLangFields change.metainfoLangFields', '.meta_lang_input, .meta_lang_textarea', function() {
+    var container = $(this).closest('.meta_lang_field');
+    updateHiddenField(container);
+});
+
+function initializeRepeaterFields() {
+    // Verstecktes Feld bei Seitenladung aktualisieren
+    $('.meta_lang_field').each(function() {
+        updateHiddenField($(this));
+    });
+}
+
+function updateHiddenField(container) {
+    var data = [];
+    
+    container.find('.meta_lang_translation_item').each(function() {
+        var item = $(this);
+        var clangId = parseInt(item.data('clang-id'));
+        var input = item.find('.meta_lang_input, .meta_lang_textarea');
+        var value = input.val() || '';
+        
+        if (value.trim()) {
+            data.push({
+                clang_id: clangId,
+                value: value.trim()
+            });
+        }
+    });
+    
+    var jsonString = JSON.stringify(data);
+    container.find('input[type="hidden"]').val(jsonString);
+    console.log('Updated hidden field:', jsonString);
+}
+
+function escapeHtml(text) {
+    var div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
