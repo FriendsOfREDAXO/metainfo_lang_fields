@@ -98,8 +98,8 @@ $(document).off('click.metainfoLangFields', '.add-translation').on('click.metain
         } else {
             // Keine Optionen mehr verfügbar - Add-Sektion ausblenden
             select.val('');
-        container.find('.meta_lang_add_translation_section').hide();
-    }
+            container.find('.meta_lang_add_translation_section').hide();
+        }
     
     updateHiddenField(container);
 });
@@ -109,8 +109,7 @@ $(document).off('click.metainfoLangFields', '.remove-translation').on('click.met
     var item = $(this).closest('.meta_lang_translation_item');
     var container = $(this).closest('.meta_lang_field');
     var clangId = parseInt(item.data('clang-id'), 10);
-    // Get language name from data attribute instead of parsing text
-    var langName = item.data('lang-name') || item.find('label').text().trim();
+    var langName = item.data('lang-name');
         
     // Item entfernen
     item.remove();
