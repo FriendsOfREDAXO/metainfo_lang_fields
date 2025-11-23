@@ -7,6 +7,16 @@ $(document).on('rex:ready', function() {
         return;
     }
     
+    // Initialisierung durchführen
+    initializeRepeaterFields();
+    
+    // Bei Form-Submit: Sicherstellen dass hidden fields aktualisiert sind
+    $(document).on('submit', 'form', function() {
+        $('.meta_lang_field').each(function() {
+            updateHiddenField($(this));
+        });
+    });
+    
     // Übersetzung hinzufügen
     $(document).on('click', '.add-translation', function() {
         var container = $(this).closest('.meta_lang_field');
@@ -25,26 +35,6 @@ $(document).on('rex:ready', function() {
         console.log('Selected text:', selectedLangName);
         console.log('==============================');
         
-        // Zusätzliche Prüfung: Gibt es überhaupt Optionen außer der ersten?
-        var availableOptions = select.find('option[value!=""]');
-        console.log('Available options (not empty):', availableOptions.length);
-        
-        if (availableOptions.length === 0) {
-            alert('Alle Sprachen wurden bereits hinzugefügt.');
-            return;
-        }
-        
-        if (!selectedClangId || selectedClangId === '') {
-            alert('Bitte wählen Sie eine Sprache aus der Liste aus.');
-            return;
-        }
-        
-        // Prüfen ob diese Sprache bereits existiert
-        if (container.find('.meta_lang_translation_item[data-clang-id="' + selectedClangId + '"]').length > 0) {
-            alert('Diese Sprache wurde bereits hinzugefügt.');
-            return;
-        }
-        
         var newValueInput = container.find('.meta_lang_new_translation_input, .meta_lang_new_translation_textarea');
         var newValue = newValueInput.val();
         
@@ -57,8 +47,28 @@ $(document).on('rex:ready', function() {
         console.log('Trimmed length:', newValue ? newValue.trim().length : 0);
         console.log('========================');
         
+        // Wenn kein Wert eingegeben wurde, nur Warnung wenn auch keine Sprache gewählt
         if (!newValue || !newValue.trim()) {
+            if (!selectedClangId || selectedClangId === '') {
+                // Beide leer - nichts zu tun
+                return;
+            }
             alert('Bitte geben Sie einen Text ein.');
+            return;
+        }
+        
+        // Zusätzliche Prüfung: Gibt es überhaupt Optionen außer der ersten?
+        var availableOptions = select.find('option[value!=""]');
+        console.log('Available options (not empty):', availableOptions.length);
+        
+        if (!selectedClangId || selectedClangId === '') {
+            alert('Bitte wählen Sie eine Sprache aus der Liste aus.');
+            return;
+        }
+        
+        // Prüfen ob diese Sprache bereits existiert
+        if (container.find('.meta_lang_translation_item[data-clang-id="' + selectedClangId + '"]').length > 0) {
+            alert('Diese Sprache wurde bereits hinzugefügt.');
             return;
         }
         
@@ -103,11 +113,8 @@ $(document).on('rex:ready', function() {
         if (firstAvailableOption.length > 0) {
             select.val(firstAvailableOption.val());
         } else {
+            // Keine Optionen mehr verfügbar - Add-Sektion ausblenden
             select.val('');
-        }
-        
-        // Wenn keine Sprachen mehr verfügbar, Add-Sektion ausblenden
-        if (select.find('option').length === 0) {
             container.find('.meta_lang_add_translation_section').hide();
         }
         
@@ -119,14 +126,38 @@ $(document).on('rex:ready', function() {
         var item = $(this).closest('.meta_lang_translation_item');
         var container = $(this).closest('.meta_lang_field');
         var clangId = item.data('clang-id');
-        var langName = item.find('label').text().trim();
+        var langName = item.find('label').text().trim().replace(/^[^\w]*/, ''); // Remove icon from text
         
         // Option zurück zum Select hinzufügen
         var select = container.find('select[name="new_lang_select"]');
-        select.append('<option value="' + clangId + '">' + langName + '</option>');
+        var newOption = $('<option value="' + clangId + '">' + langName + '</option>');
+        
+        // Option an der richtigen Stelle einfügen (sortiert nach clang_id)
+        var inserted = false;
+        select.find('option[value!=""]').each(function() {
+            if (parseInt($(this).val()) > clangId) {
+                $(this).before(newOption);
+                inserted = true;
+                return false;
+            }
+        });
+        if (!inserted) {
+            select.append(newOption);
+        }
         
         // Add-Sektion wieder einblenden falls versteckt
         container.find('.meta_lang_add_translation_section').show();
+        
+        // Wenn keine weiteren Einträge vorhanden, auf die neu hinzugefügte Option setzen
+        if (container.find('.meta_lang_translation_item').length === 1) {
+            select.val(clangId);
+        } else {
+            // Ansonsten erste verfügbare Option wählen
+            var firstAvailableOption = select.find('option[value!=""]:first');
+            if (firstAvailableOption.length > 0) {
+                select.val(firstAvailableOption.val());
+            }
+        }
         
         // Item entfernen
         item.remove();
@@ -140,10 +171,12 @@ $(document).on('rex:ready', function() {
         updateHiddenField(container);
     });
     
-    // Verstecktes Feld bei Seitenladung aktualisieren
-    $('.meta_lang_field').each(function() {
-        updateHiddenField($(this));
-    });
+    function initializeRepeaterFields() {
+        // Verstecktes Feld bei Seitenladung aktualisieren
+        $('.meta_lang_field').each(function() {
+            updateHiddenField($(this));
+        });
+    }
     
     function updateHiddenField(container) {
         var data = [];
