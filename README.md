@@ -229,6 +229,10 @@ Bei Fragen oder Problemen erstellen Sie gerne ein Issue im Repository.
 
 ## Changelog
 
+### Version 1.0.7
+- 🐛 **Bugfix**: Werte mit Pipe-Symbol (`|`) werden korrekt gespeichert und angezeigt (#13)
+- 🔧 Extension Point `METAINFO_CUSTOM_FIELD` mit `EARLY` Priorität registriert für zuverlässige Datenbehandlung
+
 ### Version 1.0.1
 - ✨ Neue Helper-Methoden für Artikel, Medien und Kategorien
 - 🔄 Automatische Fallback-Mechanismen

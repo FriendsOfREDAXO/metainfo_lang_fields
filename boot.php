@@ -9,6 +9,39 @@
 $addon = rex_addon::get('metainfo_lang_fields');
 
 if (rex::isBackend()) {
+    // Fix für Issue #13: Werte mit Pipe-Symbol (|) werden korrekt zusammengefügt
+    // REDAXO-Core zerlegt Werte an jedem |, daher müssen wir sie vorher wieder zusammenfügen
+    // Handler mit EARLY-Priorität registrieren, damit er VOR dem Feldtyp-Handler läuft
+    rex_extension::register(
+        'METAINFO_CUSTOM_FIELD',
+        static function (rex_extension_point $ep) {
+            $subject = $ep->getSubject();
+            
+            // Nur für unterstützte lang_* Feldtypen
+            $langTypes = ['lang_text', 'lang_textarea', 'lang_text_all', 'lang_textarea_all'];
+            
+            if (
+                isset($subject['type'], $subject['values'])
+                && in_array($subject['type'], $langTypes, true)
+                && is_array($subject['values'])
+                && count($subject['values']) > 1
+            ) {
+                // Zersplitterte Values wieder zusammenfügen mit Pipe-Symbol
+                // Da JSON nie mit | beginnt/endet, ist das verlustfrei
+                $joined = implode('|', $subject['values']);
+                $subject['values'] = [$joined];
+                
+                // Auch rawvalues aktualisieren wenn vorhanden
+                if (isset($subject['rawvalues']) && is_array($subject['rawvalues'])) {
+                    $subject['rawvalues'] = [$joined];
+                }
+            }
+            
+            return $subject;
+        },
+        rex_extension::EARLY
+    );
+    
     // Assets bei allen relevanten Seiten laden
     $currentPage = rex_request('page', 'string');
     
