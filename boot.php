@@ -8,7 +8,12 @@
 
 $addon = rex_addon::get('metainfo_lang_fields');
 
-if (rex::isBackend()) {
+// boot.php kann innerhalb desselben Prozesses mehrfach eingebunden werden
+// (z.B. bei kombinierten page+rex-api-call-Requests wie REDAXOs Session-Status-
+// Ping) -- rex_view::addCssFile() wirft bei doppelter Registrierung derselben
+// Datei eine Exception, daher hier einmalig absichern.
+if (rex::isBackend() && !defined('METAINFO_LANG_FIELDS_BOOTED')) {
+    define('METAINFO_LANG_FIELDS_BOOTED', true);
     // Fix für Issue #13: Werte mit Pipe-Symbol (|) werden korrekt zusammengefügt
     // REDAXO-Core zerlegt Werte an jedem |, daher müssen wir sie vorher wieder zusammenfügen
     // Handler mit EARLY-Priorität registrieren, damit er VOR dem Feldtyp-Handler läuft
@@ -42,37 +47,17 @@ if (rex::isBackend()) {
         rex_extension::EARLY
     );
     
-    // Assets bei allen relevanten Seiten laden
-    $currentPage = rex_request('page', 'string');
-    
-    // Prüfen ob es eine Seite ist die Metainfo-Felder verwenden könnte
-    $metainfoPages = [
-        'metainfo/articles',
-        'metainfo/categories', 
-        'metainfo/media',
-        'metainfo/clangs',
-        'structure',                // Struktur (Artikel/Kategorien)
-        'structure/edit',           // Artikel bearbeiten
-        'structure/category',       // Kategorie bearbeiten
-        'mediapool',               // Medienpool allgemein
-        'mediapool/media',         // Media Detail
-        'mediapool/upload',        // Media Upload
-        'content',                 // Content-Seiten
-        'content/edit'             // Content bearbeiten
-    ];
-    
-    // Auch bei Seiten die mit structure/ oder mediapool/ beginnen
-    $loadAssets = in_array($currentPage, $metainfoPages) || 
-                  str_starts_with($currentPage, 'structure/') || 
-                  str_starts_with($currentPage, 'mediapool/') ||
-                  str_starts_with($currentPage, 'content/');
-    
-    if ($loadAssets) {
-        rex_view::addCssFile($addon->getAssetsUrl('metainfo-lang-fields.css'));
-        rex_view::addJsFile($addon->getAssetsUrl('metainfo-lang-fields.js'));
-        rex_view::addJsFile($addon->getAssetsUrl('metainfo-lang-fields-all.js'));
-        rex_extension::register('METAINFO_CUSTOM_FIELD', 'metainfo_lang_fields_custom_field');
-    }
+    // Assets und Render-Handler unconditional laden: die Seiten-Erkennung per
+    // rex_request('page') deckte nur eine feste Liste bekannter Seiten ab und
+    // griff nicht bei anderen Aufrufkontexten, die Metainfo-Formulare rendern
+    // koennen (z.B. eigene rex-api-call-Endpunkte anderer Addons). Registrierung
+    // selbst kostet nichts, solange das Extension Point nicht tatsaechlich
+    // gefeuert wird -- die kleine CSS/JS-Datei bei jedem Backend-Request
+    // mitzuladen ist der einfachere, robuste Kompromiss.
+    rex_view::addCssFile($addon->getAssetsUrl('metainfo-lang-fields.css'));
+    rex_view::addJsFile($addon->getAssetsUrl('metainfo-lang-fields.js'));
+    rex_view::addJsFile($addon->getAssetsUrl('metainfo-lang-fields-all.js'));
+    rex_extension::register('METAINFO_CUSTOM_FIELD', 'metainfo_lang_fields_custom_field');
 
     // Hook in OUTPUT_FILTER um die Beschreibungen zu formatieren (Detailansicht)
     rex_extension::register('OUTPUT_FILTER', function(rex_extension_point $ep) {
