@@ -74,32 +74,32 @@ if (is_array($languageData)) {
                 <label class="control-label meta_lang_control_label">
                     <i class="fa fa-flag meta_lang_flag_icon_primary"></i>
                     <?= rex_escape($firstLang->getName() . ' (' . $firstLang->getCode() . ')') ?>
-                    <span class="text-muted">(Hauptsprache)</span>
+                    <span class="text-muted">(<?= rex_escape(rex_i18n::msg('metainfo_lang_fields_primary_language')) ?>)</span>
                 </label>
             </div>
             <div class="col-sm-9">
                 <div class="input-group">
                     <?php if ($fieldType === 'textarea'): ?>
-                        <textarea class="<?= rex_escape($fieldClass) ?> meta_lang_field_input" 
+                        <textarea class="<?= rex_escape($fieldClass) ?> meta_lang_field_input"
                                   data-clang-id="<?= $firstClangId ?>"
-                                  rows="6" 
-                                  placeholder="<?= rex_escape($firstLang->getName()) ?> Text..."<?= $additionalAttrsString ?>><?= rex_escape($firstValue) ?></textarea>
+                                  rows="6"
+                                  placeholder="<?= rex_escape($firstLang->getName() . ' ' . rex_i18n::msg('metainfo_lang_fields_placeholder_text')) ?>"<?= $additionalAttrsString ?>><?= rex_escape($firstValue) ?></textarea>
                     <?php else: ?>
-                        <input type="text" 
-                               class="<?= rex_escape($fieldClass) ?> meta_lang_field_input" 
+                        <input type="text"
+                               class="<?= rex_escape($fieldClass) ?> meta_lang_field_input"
                                data-clang-id="<?= $firstClangId ?>"
-                               value="<?= rex_escape($firstValue) ?>" 
-                               placeholder="<?= rex_escape($firstLang->getName()) ?> Text..."<?= $additionalAttrsString ?> />
+                               value="<?= rex_escape($firstValue) ?>"
+                               placeholder="<?= rex_escape($firstLang->getName() . ' ' . rex_i18n::msg('metainfo_lang_fields_placeholder_text')) ?>"<?= $additionalAttrsString ?> />
                     <?php endif; ?>
-                    
+
                     <?php if (count($allLanguages) > 1): ?>
                     <div class="input-group-btn">
-                        <button type="button" 
-                                class="btn btn-default" 
-                                data-toggle="collapse" 
-                                data-target="#additional-languages-<?= rex_escape($fieldName) ?>" 
+                        <button type="button"
+                                class="btn btn-default"
+                                data-toggle="collapse"
+                                data-target="#additional-languages-<?= rex_escape($fieldName) ?>"
                                 aria-expanded="false"
-                                title="Weitere Sprachen (<?= count($allLanguages) - 1 ?>)">
+                                title="<?= rex_escape(rex_i18n::msg('metainfo_lang_fields_more_languages', (string) (count($allLanguages) - 1))) ?>">
                             <i class="fas fa-globe"></i>
                         </button>
                     </div>
@@ -126,16 +126,16 @@ if (is_array($languageData)) {
                     </div>
                     <div class="col-sm-9">
                         <?php if ($fieldType === 'textarea'): ?>
-                            <textarea class="<?= rex_escape($fieldClass) ?> meta_lang_field_input" 
+                            <textarea class="<?= rex_escape($fieldClass) ?> meta_lang_field_input"
                                       data-clang-id="<?= $clangId ?>"
-                                      rows="4" 
-                                      placeholder="<?= rex_escape($language->getName()) ?> Text..."<?= $additionalAttrsString ?>><?= rex_escape($langValue) ?></textarea>
+                                      rows="4"
+                                      placeholder="<?= rex_escape($language->getName() . ' ' . rex_i18n::msg('metainfo_lang_fields_placeholder_text')) ?>"<?= $additionalAttrsString ?>><?= rex_escape($langValue) ?></textarea>
                         <?php else: ?>
-                            <input type="text" 
-                                   class="<?= rex_escape($fieldClass) ?> meta_lang_field_input" 
+                            <input type="text"
+                                   class="<?= rex_escape($fieldClass) ?> meta_lang_field_input"
                                    data-clang-id="<?= $clangId ?>"
-                                   value="<?= rex_escape($langValue) ?>" 
-                                   placeholder="<?= rex_escape($language->getName()) ?> Text..."<?= $additionalAttrsString ?> />
+                                   value="<?= rex_escape($langValue) ?>"
+                                   placeholder="<?= rex_escape($language->getName() . ' ' . rex_i18n::msg('metainfo_lang_fields_placeholder_text')) ?>"<?= $additionalAttrsString ?> />
                         <?php endif; ?>
                     </div>
                 </div>

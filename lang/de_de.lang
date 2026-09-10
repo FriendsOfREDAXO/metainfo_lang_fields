@@ -1,0 +1,11 @@
+metainfo_lang_fields_primary_language = Hauptsprache
+metainfo_lang_fields_more_languages = Weitere Sprachen ({0})
+metainfo_lang_fields_placeholder_text = Text...
+metainfo_lang_fields_remove_translation = Übersetzung entfernen
+metainfo_lang_fields_add_translation = Übersetzung hinzufügen
+metainfo_lang_fields_new_language_label = Neue Sprache:
+metainfo_lang_fields_select_language = Sprache wählen...
+metainfo_lang_fields_new_translation_placeholder = Neue Übersetzung...
+metainfo_lang_fields_language_already_added = Diese Sprache wurde bereits hinzugefügt.
+metainfo_lang_fields_please_enter_text = Bitte geben Sie einen Text ein.
+metainfo_lang_fields_please_select_language = Bitte wählen Sie eine Sprache aus der Liste aus.

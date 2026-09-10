@@ -11,11 +11,23 @@ namespace FriendsOfRedaxo\MetaInfoLangFields;
 class MetainfoLangHelper
 {
     /**
-     * Alle aktiven Sprachen abrufen
+     * Alle in REDAXO konfigurierten Sprachen abrufen (inklusive offline geschalteter).
+     *
+     * Trotz des Namens KEINE Filterung auf Online-Sprachen (Bestandsverhalten,
+     * aus Kompatibilitätsgründen unverändert). Für nur online geschaltete
+     * Sprachen bitte {@see self::getOnlineLanguages()} verwenden.
      */
     public static function getActiveLanguages(): array
     {
         return \rex_clang::getAll();
+    }
+
+    /**
+     * Alle online geschalteten Sprachen abrufen.
+     */
+    public static function getOnlineLanguages(): array
+    {
+        return \rex_clang::getAll(true);
     }
 
     /**
@@ -82,7 +94,7 @@ class MetainfoLangHelper
     public static function hasTranslationForLanguage($data, int $clangId): bool
     {
         $value = self::getValueForLanguage($data, $clangId);
-        return !empty(trim($value));
+        return '' !== trim($value);
     }
 
     /**
@@ -107,7 +119,7 @@ class MetainfoLangHelper
     /**
      * HTML für Sprach-Select generieren
      */
-    public static function getLanguageSelectHtml(string $name, int $selectedId = null): string
+    public static function getLanguageSelectHtml(string $name, ?int $selectedId = null): string
     {
         $languages = self::getActiveLanguages();
         $html = '<select name="' . \rex_escape($name) . '" class="form-control meta_lang_select">';
@@ -133,7 +145,7 @@ class MetainfoLangHelper
      * @param bool $useFallback Bei true: Fallback auf Standardsprache wenn leer
      * @return string Übersetzter Wert oder leerer String
      */
-    public static function getMediaValue($media, string $fieldName, int $clangId = null, bool $useFallback = true): string
+    public static function getMediaValue($media, string $fieldName, ?int $clangId = null, bool $useFallback = true): string
     {
         // Medium-Objekt validieren
         if (is_string($media)) {
@@ -157,7 +169,7 @@ class MetainfoLangHelper
         $value = self::getValueForLanguage($fieldValue, $clangId);
         
         // Fallback auf Standardsprache
-        if (empty($value) && $useFallback && $clangId !== \rex_clang::getStartId()) {
+        if ('' === $value && $useFallback && $clangId !== \rex_clang::getStartId()) {
             $value = self::getValueForLanguage($fieldValue, \rex_clang::getStartId());
         }
 
@@ -173,7 +185,7 @@ class MetainfoLangHelper
      * @param bool $useFallback Bei true: Fallback auf Standardsprache wenn leer
      * @return string Übersetzter Wert oder leerer String
      */
-    public static function getArticleValue($article, string $fieldName, int $clangId = null, bool $useFallback = true): string
+    public static function getArticleValue($article, string $fieldName, ?int $clangId = null, bool $useFallback = true): string
     {
         // Artikel-Objekt validieren
         if (is_int($article)) {
@@ -197,7 +209,7 @@ class MetainfoLangHelper
         $value = self::getValueForLanguage($fieldValue, $clangId);
         
         // Fallback auf Standardsprache
-        if (empty($value) && $useFallback && $clangId !== \rex_clang::getStartId()) {
+        if ('' === $value && $useFallback && $clangId !== \rex_clang::getStartId()) {
             $value = self::getValueForLanguage($fieldValue, \rex_clang::getStartId());
         }
 
@@ -213,7 +225,7 @@ class MetainfoLangHelper
      * @param bool $useFallback Bei true: Fallback auf Standardsprache wenn leer
      * @return string Übersetzter Wert oder leerer String
      */
-    public static function getCategoryValue($category, string $fieldName, int $clangId = null, bool $useFallback = true): string
+    public static function getCategoryValue($category, string $fieldName, ?int $clangId = null, bool $useFallback = true): string
     {
         // Kategorie-Objekt validieren
         if (is_int($category)) {
@@ -237,7 +249,7 @@ class MetainfoLangHelper
         $value = self::getValueForLanguage($fieldValue, $clangId);
         
         // Fallback auf Standardsprache
-        if (empty($value) && $useFallback && $clangId !== \rex_clang::getStartId()) {
+        if ('' === $value && $useFallback && $clangId !== \rex_clang::getStartId()) {
             $value = self::getValueForLanguage($fieldValue, \rex_clang::getStartId());
         }
 

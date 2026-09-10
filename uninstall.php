@@ -8,4 +8,4 @@
 
 // Feldtypen aus der metainfo_type Tabelle entfernen
 $sql = rex_sql::factory();
-$sql->setQuery('DELETE FROM ' . rex::getTable('metainfo_type') . ' WHERE label IN (?, ?)', ['lang_text', 'lang_textarea']);
+$sql->setQuery('DELETE FROM ' . rex::getTable('metainfo_type') . ' WHERE label IN (?, ?, ?, ?)', ['lang_text', 'lang_textarea', 'lang_text_all', 'lang_textarea_all']);
