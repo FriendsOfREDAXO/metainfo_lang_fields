@@ -28,7 +28,7 @@ $availableLanguages = \FriendsOfRedaxo\MetaInfoLangFields\MetainfoLangHelper::ge
 $allLanguages = \FriendsOfRedaxo\MetaInfoLangFields\MetainfoLangHelper::getActiveLanguages();
 ?>
 
-<div class="meta_lang_field" data-field-name="<?= rex_escape($fieldName) ?>">
+<div class="meta_lang_field" data-field-name="<?= rex_escape($fieldName) ?>" data-field-class="<?= rex_escape($fieldClass) ?>" data-additional-attrs="<?= rex_escape((string) json_encode($additionalAttributes, JSON_UNESCAPED_UNICODE)) ?>">
     
     
     <?php if (!empty($fieldLabel)): ?>
@@ -75,16 +75,16 @@ $allLanguages = \FriendsOfRedaxo\MetaInfoLangFields\MetainfoLangHelper::getActiv
                             <textarea class="<?= rex_escape($fieldClass) ?> meta_lang_textarea" 
                                       rows="4" cols="50"<?= $additionalAttrsString ?>><?= rex_escape($langValue) ?></textarea>
                         <?php else: ?>
-                            <input type="text" 
-                                   class="<?= rex_escape($fieldClass) ?> meta_lang_input" 
-                                   value="<?= rex_escape($langValue) ?>" 
-                                   placeholder="<?= rex_escape($language->getName()) ?> Text..."<?= $additionalAttrsString ?> />
+                            <input type="text"
+                                   class="<?= rex_escape($fieldClass) ?> meta_lang_input"
+                                   value="<?= rex_escape($langValue) ?>"
+                                   placeholder="<?= rex_escape($language->getName() . ' ' . rex_i18n::msg('metainfo_lang_fields_placeholder_text')) ?>"<?= $additionalAttrsString ?> />
                         <?php endif; ?>
                     </div>
                     <div class="col-sm-1">
-                        <button type="button" 
-                                class="btn btn-danger btn-sm remove-translation meta_lang_button" 
-                                title="Übersetzung entfernen">
+                        <button type="button"
+                                class="btn btn-danger btn-sm remove-translation meta_lang_button"
+                                title="<?= rex_escape(rex_i18n::msg('metainfo_lang_fields_remove_translation')) ?>">
                             ✗
                         </button>
                     </div>
@@ -97,12 +97,12 @@ $allLanguages = \FriendsOfRedaxo\MetaInfoLangFields\MetainfoLangHelper::getActiv
     <!-- Neue Übersetzung hinzufügen -->
     <div class="meta_lang_add_translation_section"<?php if (empty($availableLanguages)): ?> style="display: none;"<?php endif; ?>>
         <div class="row">
-                        <div class="col-sm-3">
-                <label class="control-label meta_lang_control_label">Neue Sprache:</label>
+            <div class="col-sm-3">
+                <label class="control-label meta_lang_control_label"><?= rex_escape(rex_i18n::msg('metainfo_lang_fields_new_language_label')) ?></label>
             </div>
             <div class="col-sm-3">
                 <select name="new_lang_select" class="form-control meta_lang_select">
-                    <option value="">Sprache wählen...</option>
+                    <option value=""><?= rex_escape(rex_i18n::msg('metainfo_lang_fields_select_language')) ?></option>
                     <?php foreach ($availableLanguages as $lang): ?>
                         <option value="<?= $lang->getId() ?>">
                             <?= rex_escape($lang->getName() . ' (' . $lang->getCode() . ')') ?>
@@ -112,19 +112,19 @@ $allLanguages = \FriendsOfRedaxo\MetaInfoLangFields\MetainfoLangHelper::getActiv
             </div>
             <div class="col-sm-5">
                 <?php if ($fieldType === 'textarea'): ?>
-                    <textarea class="<?= rex_escape($fieldClass) ?> meta_lang_new_translation_textarea" 
-                              rows="4" cols="50" 
-                              placeholder="Neue Übersetzung..."<?= $additionalAttrsString ?>></textarea>
+                    <textarea class="<?= rex_escape($fieldClass) ?> meta_lang_new_translation_textarea"
+                              rows="4" cols="50"
+                              placeholder="<?= rex_escape(rex_i18n::msg('metainfo_lang_fields_new_translation_placeholder')) ?>"<?= $additionalAttrsString ?>></textarea>
                 <?php else: ?>
-                    <input type="text" 
-                           class="<?= rex_escape($fieldClass) ?> meta_lang_new_translation_input" 
-                           placeholder="Neue Übersetzung..."<?= $additionalAttrsString ?> />
+                    <input type="text"
+                           class="<?= rex_escape($fieldClass) ?> meta_lang_new_translation_input"
+                           placeholder="<?= rex_escape(rex_i18n::msg('metainfo_lang_fields_new_translation_placeholder')) ?>"<?= $additionalAttrsString ?> />
                 <?php endif; ?>
             </div>
             <div class="col-sm-1">
-                <button type="button" 
-                        class="btn btn-success btn-sm add-translation meta_lang_button" 
-                        title="Übersetzung hinzufügen">
+                <button type="button"
+                        class="btn btn-success btn-sm add-translation meta_lang_button"
+                        title="<?= rex_escape(rex_i18n::msg('metainfo_lang_fields_add_translation')) ?>">
                     +
                 </button>
             </div>

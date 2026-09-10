@@ -57,23 +57,31 @@ if (rex::isBackend() && !defined('METAINFO_LANG_FIELDS_BOOTED')) {
     rex_view::addCssFile($addon->getAssetsUrl('metainfo-lang-fields.css'));
     rex_view::addJsFile($addon->getAssetsUrl('metainfo-lang-fields.js'));
     rex_view::addJsFile($addon->getAssetsUrl('metainfo-lang-fields-all.js'));
+
+    // UI-Strings fürs Repeater-JS (alert()-Meldungen) sprachabhängig bereitstellen,
+    // analog zu core's eigenem rex.i18n-Muster (siehe core/fragments/core/top.php).
+    rex_view::setJsProperty('metainfoLangFields', [
+        'languageAlreadyAdded' => rex_i18n::msg('metainfo_lang_fields_language_already_added'),
+        'pleaseEnterText' => rex_i18n::msg('metainfo_lang_fields_please_enter_text'),
+        'pleaseSelectLanguage' => rex_i18n::msg('metainfo_lang_fields_please_select_language'),
+    ]);
     rex_extension::register('METAINFO_CUSTOM_FIELD', 'metainfo_lang_fields_custom_field');
 
     // Hook in OUTPUT_FILTER um die Beschreibungen zu formatieren (Detailansicht)
     rex_extension::register('OUTPUT_FILTER', function(rex_extension_point $ep) {
         $content = $ep->getSubject();
-        
+
         // Null-Check für Content
         if (!$content) {
             return $content;
         }
-        
+
         // Nur auf MediaPool Seiten
         $currentPage = rex_be_controller::getCurrentPage();
         if (!$currentPage || strpos($currentPage, 'mediapool') === false) {
             return $content;
         }
-        
+
         // Verschiedene Patterns für escaped/unescaped JSON
         $patterns = [
             '/<p>\[(\{&quot;clang_id&quot;[^<]+)\]<\/p>/', // HTML-escaped
@@ -81,63 +89,20 @@ if (rex::isBackend() && !defined('METAINFO_LANG_FIELDS_BOOTED')) {
             '/<p>(\[.*?clang_id.*?\])<\/p>/', // Allgemeiner
             '/<p>([^<]*clang_id[^<]*)<\/p>/' // Noch allgemeiner
         ];
-        
+
         foreach ($patterns as $pattern) {
             $matches = [];
             if (preg_match_all($pattern, $content, $matches)) {
                 // Verwende das erste funktionierende Pattern
                 $content = preg_replace_callback($pattern, function($match) {
-                    $jsonString = $match[1] ?? '';
-                    
-                    // Null/Empty-Check
-                    if (!$jsonString) {
-                        return $match[0];
-                    }
-                    
-                    // HTML-Entities dekodieren falls nötig
-                    if (strpos($jsonString, '&quot;') !== false) {
-                        $jsonString = html_entity_decode($jsonString);
-                    }
-                    
-                    // Sicherstellen dass es mit [ beginnt
-                    if (!str_starts_with($jsonString, '[')) {
-                        $jsonString = '[' . $jsonString . ']';
-                    }
-                    
-                    try {
-                        $langData = json_decode($jsonString, true);
-                        if (is_array($langData)) {
-                            $currentLang = rex_clang::getCurrentId();
-                            
-                            // Suche aktuelle Sprache
-                            foreach ($langData as $entry) {
-                                if (isset($entry['clang_id']) && isset($entry['value']) && 
-                                    $entry['clang_id'] == $currentLang && !empty($entry['value'])) {
-                                    $clang = rex_clang::get($entry['clang_id']);
-                                    $langCode = $clang ? strtoupper($clang->getCode()) : 'L' . $entry['clang_id'];
-                                    return '<p><strong>' . $langCode . ':</strong> ' . htmlspecialchars($entry['value']) . '</p>';
-                                }
-                            }
-                            
-                            // Fallback: erste verfügbare Sprache
-                            foreach ($langData as $entry) {
-                                if (isset($entry['clang_id']) && isset($entry['value']) && !empty($entry['value'])) {
-                                    $clang = rex_clang::get($entry['clang_id']);
-                                    $langCode = $clang ? strtoupper($clang->getCode()) : 'L' . $entry['clang_id'];
-                                    return '<p><strong>' . $langCode . ':</strong> ' . htmlspecialchars($entry['value']) . '</p>';
-                                }
-                            }
-                        }
-                    } catch (Exception $e) {
-                        // Bei Fehlern das Original zurückgeben
-                    }
-                    return $match[0];
+                    $rendered = metainfo_lang_fields_render_lang_json($match[1] ?? '', null);
+                    return $rendered !== null ? '<p>' . $rendered . '</p>' : $match[0];
                 }, $content);
-                
+
                 break; // Verwende nur das erste funktionierende Pattern
             }
         }
-        
+
         return $content;
     });
 
@@ -147,7 +112,7 @@ if (rex::isBackend() && !defined('METAINFO_LANG_FIELDS_BOOTED')) {
             // Hook into MediaPool output rendering
             rex_extension::register('OUTPUT_FILTER', function(rex_extension_point $ep) {
                 $content = $ep->getSubject();
-                
+
                 // Only process if we have table content and clang_id patterns
                 if (strpos($content, '<table') !== false && strpos($content, 'clang_id') !== false) {
                     // Pattern for JSON strings in the content
@@ -155,61 +120,84 @@ if (rex::isBackend() && !defined('METAINFO_LANG_FIELDS_BOOTED')) {
                         '/\[{"clang_id"[^\]]*}\]/',
                         '/\[{&quot;clang_id&quot;[^\]]*}\]/',
                     ];
-                    
+
                     foreach ($patterns as $pattern) {
                         if (preg_match_all($pattern, $content, $matches)) {
                             $content = preg_replace_callback($pattern, function($match) {
-                                $jsonString = $match[0];
-                                
-                                // HTML-Entities dekodieren
-                                $jsonString = html_entity_decode($jsonString);
-                                
-                                try {
-                                    $langData = json_decode($jsonString, true);
-                                    
-                                    if (is_array($langData)) {
-                                        $currentLang = rex_clang::getCurrentId();
-                                        
-                                        // Suche aktuelle Sprache
-                                        foreach ($langData as $entry) {
-                                            if (isset($entry['clang_id']) && isset($entry['value']) && 
-                                                $entry['clang_id'] == $currentLang && !empty($entry['value'])) {
-                                                $clang = rex_clang::get($entry['clang_id']);
-                                                $langCode = $clang ? strtoupper($clang->getCode()) : 'L' . $entry['clang_id'];
-                                                return '<strong>' . $langCode . ':</strong> ' . htmlspecialchars($entry['value']);
-                                            }
-                                        }
-                                        
-                                        // Fallback: erste verfügbare Sprache
-                                        foreach ($langData as $entry) {
-                                            if (isset($entry['clang_id']) && isset($entry['value']) && !empty($entry['value'])) {
-                                                $clang = rex_clang::get($entry['clang_id']);
-                                                $langCode = $clang ? strtoupper($clang->getCode()) : 'L' . $entry['clang_id'];
-                                                return '<strong>' . $langCode . ':</strong> ' . htmlspecialchars($entry['value']);
-                                            }
-                                        }
-                                        
-                                        // Keine Werte gefunden - leere JSON-Struktur
-                                        return '<em>Keine Beschreibung</em>';
-                                    }
-                                } catch (Exception $e) {
-                                    // Bei JSON-Fehlern Original beibehalten
-                                }
-                                
-                                return $match[0];
+                                $rendered = metainfo_lang_fields_render_lang_json($match[0], '<em>Keine Beschreibung</em>');
+                                return $rendered ?? $match[0];
                             }, $content);
-                            
+
                             break; // Stop after first successful pattern
                         }
                     }
                 }
-                
+
                 return $content;
             }, rex_extension::LATE); // Use LATE priority to ensure it runs after other processing
         }
     });
 }
 
+/**
+ * Dekodiert einen (ggf. HTML-escaped) mehrsprachigen JSON-Wert und rendert
+ * ihn als lesbaren "<strong>SPRACHKÜRZEL:</strong> Wert"-Text für die aktuelle
+ * Sprache, mit Fallback auf die erste verfügbare Übersetzung.
+ *
+ * Gemeinsame Kernlogik der beiden OUTPUT_FILTER-Handler (Mediapool-Detail- und
+ * -Listenansicht), die sich nur in Matching-Pattern und Leerwert-Verhalten
+ * unterscheiden.
+ *
+ * @param string $jsonString Der (ggf. noch HTML-escaped) JSON-Ausschnitt
+ * @param string|null $emptyFallback Rückgabewert, wenn kein Sprachwert gefunden wurde
+ *                                   (null = Original beibehalten, Aufrufer entscheidet)
+ * @return string|null Gerenderter Text (ohne umschließendes Tag), oder null falls kein
+ *                      auswertbares JSON vorliegt
+ */
+function metainfo_lang_fields_render_lang_json(string $jsonString, ?string $emptyFallback): ?string
+{
+    if ('' === $jsonString) {
+        return null;
+    }
+
+    // HTML-Entities dekodieren falls nötig
+    if (strpos($jsonString, '&quot;') !== false) {
+        $jsonString = html_entity_decode($jsonString);
+    }
+
+    // Sicherstellen dass es mit [ beginnt
+    if (!str_starts_with($jsonString, '[')) {
+        $jsonString = '[' . $jsonString . ']';
+    }
+
+    $langData = json_decode($jsonString, true);
+    if (!is_array($langData)) {
+        return null;
+    }
+
+    $currentLang = rex_clang::getCurrentId();
+    $renderEntry = static function (array $entry): string {
+        $clang = rex_clang::get((int) $entry['clang_id']);
+        $langCode = $clang ? strtoupper($clang->getCode()) : 'L' . $entry['clang_id'];
+        return '<strong>' . $langCode . ':</strong> ' . htmlspecialchars((string) $entry['value']);
+    };
+
+    // Suche aktuelle Sprache
+    foreach ($langData as $entry) {
+        if (isset($entry['clang_id'], $entry['value']) && (int) $entry['clang_id'] === $currentLang && '' !== trim((string) $entry['value'])) {
+            return $renderEntry($entry);
+        }
+    }
+
+    // Fallback: erste verfügbare Sprache
+    foreach ($langData as $entry) {
+        if (isset($entry['clang_id'], $entry['value']) && '' !== trim((string) $entry['value'])) {
+            return $renderEntry($entry);
+        }
+    }
+
+    return $emptyFallback;
+}
 
 
 
@@ -238,31 +226,30 @@ function metainfo_lang_fields_custom_field(rex_extension_point $ep)
     $additionalAttributes = [];
     
     if (isset($subject['sql']) && $subject['sql'] instanceof rex_sql) {
-        $attributes = $subject['sql']->getValue('attributes');
+        $attributes = (string) $subject['sql']->getValue('attributes');
         if (!empty($attributes)) {
             $fieldAttributes = $attributes;
-            
-            // CSS-Klassen aus Attributen extrahieren
-            if (preg_match('/class="([^"]*)"/', $attributes, $matches)) {
-                $fieldClass = $matches[1];
-            } elseif (preg_match("/class='([^']*)'/", $attributes, $matches)) {
-                $fieldClass = $matches[1];
-            }
-            
-            // Alle anderen Attribute (data-*, id, etc.) extrahieren
-            // Entferne class-Attribute und behalte den Rest
-            $remainingAttributes = preg_replace('/class=("[^"]*"|\'[^\']*\')/', '', $attributes);
-            $remainingAttributes = trim($remainingAttributes);
-            
-            if (!empty($remainingAttributes)) {
-                // Attribute in Array parsen für bessere Handhabung
-                preg_match_all('/(\w+(?:-\w+)*)=("[^"]*"|\'[^\']*\')/', $remainingAttributes, $attrMatches, PREG_SET_ORDER);
-                foreach ($attrMatches as $match) {
-                    $attrName = $match[1];
-                    $attrValue = trim($match[2], '"\'');
-                    $additionalAttributes[$attrName] = $attrValue;
+
+            // Attribute wie metainfo-Core selbst parsen (rex_string::split), damit auch
+            // wertlose Attribute (readonly, disabled, data-foo) korrekt erkannt werden -
+            // eine eigene Regex hätte nur key="value"-Paare erfasst.
+            $attrArray = rex_string::split($attributes);
+
+            // rex_string::split liefert wertlose Attribute als int-indizierte Einträge;
+            // in [name => ''] umwandeln, analog zu metainfo/lib/handler/handler.php.
+            foreach ($attrArray as $key => $value) {
+                if (is_int($key)) {
+                    unset($attrArray[$key]);
+                    $attrArray[$value] = '';
                 }
             }
+
+            if (isset($attrArray['class'])) {
+                $fieldClass = $attrArray['class'];
+                unset($attrArray['class']);
+            }
+
+            $additionalAttributes = $attrArray;
         }
     }
     

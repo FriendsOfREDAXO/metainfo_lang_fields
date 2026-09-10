@@ -66,9 +66,9 @@ class="form-control cke5-editor" data-profile="full"
           data-profile="default">Inhalt...</textarea>
 ```
 
-> ⚠️ **Wichtig**: CKE5 funktioniert nur zuverlässig mit `lang_textarea_all` (Alle Sprachen Modus). Im Repeater-Modus können dynamisch hinzugefügte Felder nicht automatisch mit CKE5 initialisiert werden.
+> ⚠️ **Wichtig**: CKE5 funktioniert nur zuverlässig mit `lang_textarea_all` (Alle Sprachen Modus). Im Repeater-Modus wird für dynamisch (per JS) hinzugefügte Sprachen kein CKE5-Editor initialisiert, auch wenn die Attribute korrekt übernommen werden (siehe unten) — Grund ist, dass der Editor beim Hinzufügen einer neuen Zeile nicht erneut aufgerufen wird.
 
-> 💡 **Tipp**: Die ursprünglichen CSS-Klassen und Attribute werden automatisch an alle generierten Textareas/Input-Felder weitergegeben!
+> 💡 **Tipp**: Die ursprünglichen CSS-Klassen und Attribute (auch wertlose wie `readonly` oder `disabled`) werden an alle initial gerenderten und alle per JS dynamisch hinzugefügten Textareas/Input-Felder weitergegeben.
 
 ### Daten im Frontend abrufen
 
@@ -208,6 +208,9 @@ Bei Fragen oder Problemen erstellen Sie gerne ein Issue im Repository.
 | `getValueForLanguage($data, $clangId)` | JSON-Daten, Sprach-ID | Low-Level: Wert für bestimmte Sprache |
 | `hasTranslationForLanguage($data, $clangId)` | JSON-Daten, Sprach-ID | Prüft ob Übersetzung existiert |
 | `normalizeLanguageData($data)` | JSON-Daten | Normalisiert und validiert Sprachdaten |
+| `getActiveLanguages()` | – | Alle konfigurierten Sprachen, **inklusive** offline geschalteter (Bestandsverhalten) |
+| `getOnlineLanguages()` | – | Nur online geschaltete Sprachen |
+| `getAvailableLanguages($existingData)` | JSON-Daten | Sprachen, für die noch keine Übersetzung existiert (für den "Neue Sprache hinzufügen"-Dialog) |
 
 **Parameter-Details:**
 - `$clangId = null` → Verwendet aktuelle Sprache (`rex_clang::getCurrentId()`)
@@ -228,6 +231,20 @@ Bei Fragen oder Problemen erstellen Sie gerne ein Issue im Repository.
 <a href="https://github.com/skerbis">Thomas Skerbis</a>
 
 ## Changelog
+
+### Version 1.0.9
+- 🐛 **Bugfix**: Ein gespeicherter Übersetzungswert `"0"` wurde beim Lesen (`getArticleValue()`/`getMediaValue()`/`getCategoryValue()`/`hasTranslationForLanguage()`) fälschlich als "keine Übersetzung" behandelt und durch den Fallback-Wert ersetzt (PHPs `empty("0") === true`-Falle)
+- 🐛 **Bugfix**: Per JS dynamisch hinzugefügte Sprachen im Repeater-Modus (`lang_text`/`lang_textarea`) übernahmen die im Metainfo-Feld konfigurierten CSS-Klassen und Attribute nicht — nur initial gerenderte Sprachen waren betroffen
+- 🐛 **Bugfix**: `uninstall.php` entfernte nur die Feldtypen `lang_text`/`lang_textarea` aus der Metainfo-Verwaltung, nicht aber `lang_text_all`/`lang_textarea_all` — verwaiste Einträge nach Deinstallation
+- 🐛 **Bugfix**: Attribute ohne Wert (`readonly`, `disabled`, …) aus dem Metainfo-Attribute-Feld wurden von einer eigenen Regex ignoriert; die Attribut-Erkennung nutzt jetzt dieselbe Logik (`rex_string::split()`) wie das Metainfo-Addon selbst
+- 🌍 Vollständige i18n-Unterstützung: alle Backend-Texte (Buttons, Platzhalter, Meldungen) laufen jetzt über `rex_i18n`/Sprachdateien statt fest auf Deutsch verdrahtet zu sein
+- 🔧 Zwei redundante `OUTPUT_FILTER`-Handler für die Mediapool-Anzeige (Detail- und Listenansicht) nutzen jetzt eine gemeinsame Kernfunktion statt doppelt gepflegter Regex-Logik
+- 🔧 `getActiveLanguages()` bleibt aus Kompatibilitätsgründen unverändert (liefert weiterhin auch offline Sprachen); neue Methode `getOnlineLanguages()` für nur online geschaltete Sprachen ergänzt
+- 🔧 PHP-8.1-Deprecation behoben: implizit nullable Parameter (`int $x = null`) durch `?int $x = null` ersetzt
+
+### Version 1.0.8
+- 🐛 **Bugfix**: Sprachfelder blieben in Kontexten außerhalb einer festen Seiten-Allowlist (z.B. eigene `rex-api-call`-Endpunkte anderer Add-ons, die Metainfo-Formulare rendern) leer, da Feldhandler und Assets nur auf bekannten Backend-Seiten registriert wurden. Registrierung erfolgt jetzt unconditional bei jedem Backend-Request
+- 🐛 **Bugfix**: Mehrfaches Einbinden von `boot.php` im selben Prozess (z.B. bei kombinierten Page- + `rex-api-call`-Requests wie REDAXOs Session-Status-Ping) führte zu einer Exception beim erneuten Registrieren derselben Assets; jetzt gegen doppeltes Booten abgesichert
 
 ### Version 1.0.7
 - 🐛 **Bugfix**: Werte mit Pipe-Symbol (`|`) werden korrekt gespeichert und angezeigt (#13)

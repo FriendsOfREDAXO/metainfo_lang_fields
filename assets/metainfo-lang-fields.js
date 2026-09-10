@@ -49,21 +49,21 @@ $(document).off('click.metainfoLangFields', '.add-translation').on('click.metain
         }
         // Text fehlt aber Sprache gewählt - prüfe erst ob bereits vorhanden
         if (container.find('.meta_lang_translation_item[data-clang-id="' + selectedClangId + '"]').length > 0) {
-            alert('Diese Sprache wurde bereits hinzugefügt.');
+            alert(metainfoLangFieldsMsg('languageAlreadyAdded', 'Diese Sprache wurde bereits hinzugefügt.'));
             return;
         }
-        alert('Bitte geben Sie einen Text ein.');
+        alert(metainfoLangFieldsMsg('pleaseEnterText', 'Bitte geben Sie einen Text ein.'));
         return;
     }
-    
+
     if (!selectedClangId || selectedClangId === '') {
-        alert('Bitte wählen Sie eine Sprache aus der Liste aus.');
+        alert(metainfoLangFieldsMsg('pleaseSelectLanguage', 'Bitte wählen Sie eine Sprache aus der Liste aus.'));
         return;
     }
-    
+
     // Prüfen ob diese Sprache bereits existiert
     if (container.find('.meta_lang_translation_item[data-clang-id="' + selectedClangId + '"]').length > 0) {
-        alert('Diese Sprache wurde bereits hinzugefügt.');
+        alert(metainfoLangFieldsMsg('languageAlreadyAdded', 'Diese Sprache wurde bereits hinzugefügt.'));
         return;
     }
     
@@ -122,21 +122,50 @@ $(document).off('input.metainfoLangFields change.metainfoLangFields', '.meta_lan
     updateHiddenField(container);
 });
 
+// Helper-Funktion um die zusätzlichen HTML-Attribute (z.B. data-profile für CKE5)
+// als Attribut-String zu bauen, analog zur PHP-Seite im Fragment.
+function buildAdditionalAttrsString(container) {
+    var raw = container.attr('data-additional-attrs');
+    if (!raw) {
+        return '';
+    }
+
+    var attrs;
+    try {
+        attrs = JSON.parse(raw);
+    } catch (e) {
+        return '';
+    }
+
+    if (!attrs || typeof attrs !== 'object') {
+        return '';
+    }
+
+    var attrString = '';
+    Object.keys(attrs).forEach(function(name) {
+        attrString += ' ' + escapeHtml(name) + '="' + escapeHtml(String(attrs[name])) + '"';
+    });
+    return attrString;
+}
+
 // Helper-Funktion um eine Übersetzung hinzuzufügen
 function addTranslation(container, selectedClangId, newValue) {
     var select = container.find('select[name="new_lang_select"]');
     var selectedLangName = select.find('option[value="' + selectedClangId + '"]').text();
-    
-    // Neue Übersetzung erstellen
+
+    // Neue Übersetzung erstellen - Klasse und zusätzliche Attribute (z.B. Editor-Konfiguration)
+    // müssen dieselben sein wie bei den vom Fragment gerenderten Übersetzungen.
     var fieldType = container.find('.meta_lang_new_translation_textarea').length > 0 ? 'textarea' : 'text';
+    var fieldClass = container.attr('data-field-class') || 'form-control';
+    var additionalAttrsString = buildAdditionalAttrsString(container);
     var inputHtml = '';
-    
+
     if (fieldType === 'textarea') {
-        inputHtml = '<textarea class="form-control meta_lang_textarea" rows="4" cols="50">' + 
+        inputHtml = '<textarea class="' + escapeHtml(fieldClass) + ' meta_lang_textarea" rows="4" cols="50"' + additionalAttrsString + '>' +
                    escapeHtml(newValue) + '</textarea>';
     } else {
-        inputHtml = '<input type="text" class="form-control meta_lang_input" value="' + 
-                   escapeHtml(newValue) + '" placeholder="' + escapeHtml(selectedLangName) + ' Text..." />';
+        inputHtml = '<input type="text" class="' + escapeHtml(fieldClass) + ' meta_lang_input" value="' +
+                   escapeHtml(newValue) + '" placeholder="' + escapeHtml(selectedLangName) + ' Text..."' + additionalAttrsString + ' />';
     }
     
     var newItem = $('<div class="meta_lang_translation_item" data-clang-id="' + selectedClangId + '" data-lang-name="' + escapeHtml(selectedLangName) + '">' +
@@ -202,6 +231,17 @@ function updateHiddenField(container) {
     
     var jsonString = JSON.stringify(data);
     container.find('input[type="hidden"]').val(jsonString);
+}
+
+// Liest eine sprachabhängige UI-Meldung aus dem von boot.php via
+// rex_view::setJsProperty() bereitgestellten window.rex.metainfoLangFields
+// (analog zu core's eigenem window.rex.i18n). Fällt auf den übergebenen
+// deutschen Default zurück, falls die Property fehlt (z.B. altes Boot-Setup).
+function metainfoLangFieldsMsg(key, fallback) {
+    if (typeof rex !== 'undefined' && rex.metainfoLangFields && rex.metainfoLangFields[key]) {
+        return rex.metainfoLangFields[key];
+    }
+    return fallback;
 }
 
 function escapeHtml(text) {
