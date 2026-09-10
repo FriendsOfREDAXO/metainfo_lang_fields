@@ -31,14 +31,43 @@ class MetainfoLangHelper
     }
 
     /**
+     * In-Memory-Cache für normalizeLanguageData(), keyed nach dem Rohwert.
+     * Dieselben JSON-Rohdaten werden pro Request typischerweise mehrfach
+     * normalisiert (z.B. einmal für getAvailableLanguages(), einmal für
+     * hasTranslationForLanguage()) - das Dekodieren/Parsen lohnt sich nur einmal.
+     *
+     * @var array<string, array<int, array{clang_id: int, value: mixed}>>
+     */
+    private static array $normalizeCache = [];
+
+    /**
      * JSON-Daten für Sprachfeld validieren und normalisieren
      */
     public static function normalizeLanguageData($data): array
     {
+        // Cache nur für Strings sinnvoll (der eigentliche, teure Eingabefall:
+        // rohes JSON aus der Datenbank). Bereits-array-Aufrufe sind selten und
+        // billig genug, dass sich ein Cache-Key darüber nicht lohnt.
+        $cacheKey = is_string($data) ? $data : null;
+        if (null !== $cacheKey && isset(self::$normalizeCache[$cacheKey])) {
+            return self::$normalizeCache[$cacheKey];
+        }
+
+        $normalized = self::doNormalizeLanguageData($data);
+
+        if (null !== $cacheKey) {
+            self::$normalizeCache[$cacheKey] = $normalized;
+        }
+
+        return $normalized;
+    }
+
+    private static function doNormalizeLanguageData($data): array
+    {
         if (is_string($data) && !empty($data)) {
             // HTML-Entities dekodieren falls nötig
             $cleanData = html_entity_decode($data, ENT_QUOTES, 'UTF-8');
-            
+
             $decodedData = json_decode($cleanData, true);
             if (json_last_error() === JSON_ERROR_NONE) {
                 $data = $decodedData;
@@ -60,7 +89,7 @@ class MetainfoLangHelper
             }
 
             $clangId = (int) $item['clang_id'];
-            
+
             if (!isset($normalized[$clangId])) {
                 $normalized[$clangId] = [
                     'clang_id' => $clangId,
@@ -138,7 +167,7 @@ class MetainfoLangHelper
 
     /**
      * Mehrsprachigen Wert für ein Medium abrufen
-     * 
+     *
      * @param \rex_media|string $media Medium-Objekt oder Dateiname
      * @param string $fieldName Name des Metainfo-Felds (z.B. 'med_title_lang')
      * @param int|null $clangId Sprach-ID (null = aktuelle Sprache)
@@ -147,39 +176,21 @@ class MetainfoLangHelper
      */
     public static function getMediaValue($media, string $fieldName, ?int $clangId = null, bool $useFallback = true): string
     {
-        // Medium-Objekt validieren
         if (is_string($media)) {
             $media = \rex_media::get($media);
         }
-        
+
         if (!$media instanceof \rex_media) {
             return '';
         }
 
-        // Sprach-ID bestimmen
-        $clangId = $clangId ?: \rex_clang::getCurrentId();
-        
-        // Feldwert abrufen
-        $fieldValue = $media->getValue($fieldName);
-        if (empty($fieldValue)) {
-            return '';
-        }
-
-        // Wert für gewünschte Sprache
-        $value = self::getValueForLanguage($fieldValue, $clangId);
-        
-        // Fallback auf Standardsprache
-        if ('' === $value && $useFallback && $clangId !== \rex_clang::getStartId()) {
-            $value = self::getValueForLanguage($fieldValue, \rex_clang::getStartId());
-        }
-
-        return $value;
+        return self::resolveLangValue($media->getValue($fieldName), $clangId, $useFallback);
     }
 
     /**
      * Mehrsprachigen Wert für einen Artikel abrufen
-     * 
-     * @param \rex_article|int $article Artikel-Objekt oder Artikel-ID  
+     *
+     * @param \rex_article|int $article Artikel-Objekt oder Artikel-ID
      * @param string $fieldName Name des Metainfo-Felds (z.B. 'art_title_lang')
      * @param int|null $clangId Sprach-ID (null = aktuelle Sprache)
      * @param bool $useFallback Bei true: Fallback auf Standardsprache wenn leer
@@ -187,68 +198,57 @@ class MetainfoLangHelper
      */
     public static function getArticleValue($article, string $fieldName, ?int $clangId = null, bool $useFallback = true): string
     {
-        // Artikel-Objekt validieren
         if (is_int($article)) {
             $article = \rex_article::get($article);
         }
-        
+
         if (!$article instanceof \rex_article) {
             return '';
         }
 
-        // Sprach-ID bestimmen
-        $clangId = $clangId ?: \rex_clang::getCurrentId();
-        
-        // Feldwert abrufen
-        $fieldValue = $article->getValue($fieldName);
-        if (empty($fieldValue)) {
-            return '';
-        }
-
-        // Wert für gewünschte Sprache
-        $value = self::getValueForLanguage($fieldValue, $clangId);
-        
-        // Fallback auf Standardsprache
-        if ('' === $value && $useFallback && $clangId !== \rex_clang::getStartId()) {
-            $value = self::getValueForLanguage($fieldValue, \rex_clang::getStartId());
-        }
-
-        return $value;
+        return self::resolveLangValue($article->getValue($fieldName), $clangId, $useFallback);
     }
 
     /**
      * Mehrsprachigen Wert für eine Kategorie abrufen
-     * 
+     *
      * @param \rex_category|int $category Kategorie-Objekt oder Kategorie-ID
-     * @param string $fieldName Name des Metainfo-Felds (z.B. 'cat_title_lang') 
+     * @param string $fieldName Name des Metainfo-Felds (z.B. 'cat_title_lang')
      * @param int|null $clangId Sprach-ID (null = aktuelle Sprache)
      * @param bool $useFallback Bei true: Fallback auf Standardsprache wenn leer
      * @return string Übersetzter Wert oder leerer String
      */
     public static function getCategoryValue($category, string $fieldName, ?int $clangId = null, bool $useFallback = true): string
     {
-        // Kategorie-Objekt validieren
         if (is_int($category)) {
             $category = \rex_category::get($category);
         }
-        
+
         if (!$category instanceof \rex_category) {
             return '';
         }
 
-        // Sprach-ID bestimmen
+        return self::resolveLangValue($category->getValue($fieldName), $clangId, $useFallback);
+    }
+
+    /**
+     * Gemeinsame Kernlogik von getMediaValue()/getArticleValue()/getCategoryValue():
+     * Wert für die gewünschte Sprache aus dem rohen Feldwert extrahieren, mit
+     * optionalem Fallback auf die Standardsprache. Die drei öffentlichen Methoden
+     * unterscheiden sich nur in der Objekt-Validierung und im getValue()-Aufruf.
+     *
+     * @param mixed $fieldValue Rohes JSON aus dem Metainfo-Feld
+     */
+    private static function resolveLangValue($fieldValue, ?int $clangId, bool $useFallback): string
+    {
         $clangId = $clangId ?: \rex_clang::getCurrentId();
-        
-        // Feldwert abrufen
-        $fieldValue = $category->getValue($fieldName);
+
         if (empty($fieldValue)) {
             return '';
         }
 
-        // Wert für gewünschte Sprache
         $value = self::getValueForLanguage($fieldValue, $clangId);
-        
-        // Fallback auf Standardsprache
+
         if ('' === $value && $useFallback && $clangId !== \rex_clang::getStartId()) {
             $value = self::getValueForLanguage($fieldValue, \rex_clang::getStartId());
         }
